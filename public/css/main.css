@@ -1,0 +1,57 @@
+div
+{
+	border: 1px dotted gray;
+	box-sizing:border-box;
+}
+div[name="container"]
+{
+	display:flex;
+	height:100%;
+	width:100%;
+}
+div[name="menu_box"]
+{
+	height:100%;
+	flex:1;
+}
+div[name="content_box"]
+{
+	height:100%;
+	flex:5;
+	position:relative;
+}
+div[name="image_box"]
+{
+	height:200px;
+	width:100%;
+}
+div[name="image_box"]::after
+{
+	content:"Třeba nějaký úvodní obrázek";
+	color:lightgray;
+}
+
+
+div[name="content_box"] > div
+{
+	box-sizing:border-box;
+	margin:50px;
+	width:calc(100% - 100px);
+	height:calc(100% - 100px);	
+}
+
+li.active
+{
+	font-weight:bold;
+}
+.all_container
+{
+	flex-grow:1;
+	position:relative;
+	bottom:0px;
+	overflow:scroll;
+}
+smallcaps
+{
+	font-variant: small-caps;
+}

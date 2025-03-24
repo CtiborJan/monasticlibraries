@@ -1,0 +1,38 @@
+div.ari_default
+{
+	position:absolute;
+	min-width:500px;
+	min-height:150px;
+	max-height:550px;
+	border:1px solid gray;
+	background-color:whitesmoke;
+	left:calc(50% - 100px);
+	top:200px;
+}
+div.ari_default.error
+{
+	border-color:red;
+	background-color:lightsalmon;
+}
+div.ari_content
+{
+	position:absolute;
+	top:0px;
+	left:0px;
+	width:100%;
+	bottom:25px;
+	overflow:scroll;
+}
+div.ari_bottom_strip
+{
+	position:absolute;
+	bottom:0px;
+	height:25px;
+	width:100%;
+}
+div.ari_bottom_strip button
+{
+	position:absolute;
+	left:50%;
+	transform:translateX(-50%);
+}

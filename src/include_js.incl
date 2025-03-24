@@ -1,0 +1,29 @@
+<?php
+
+function include_folder($folder,$include=[".*\..*"],$not_include=[],$path_from_root)
+{
+	$files=scandir($folder);
+	for($i=0;$i<sizeof($files);$i++)
+	{
+		if ($files[$i]!="." && $files[$i]!="..")
+		{
+			$type=substr($files[$i],strrpos($files[$i],"."));
+			foreach ($include as $incl)
+			{
+				if (preg_match("/$incl/",$files[$i])==1)
+				{
+					if ($type==".js")
+					{
+						echo "<script src='$path_from_root/$files[$i]'></script>\n";
+					}
+					else if ($type==".css")
+					{
+						echo "<link rel='stylesheet' href='$path_from_root/$files[$i]'></link>\n";
+					
+					}
+				}
+			}
+		}	
+	}
+}
+?>

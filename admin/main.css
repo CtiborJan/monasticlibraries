@@ -1,0 +1,26 @@
+#main
+{
+	height:100%;
+	display:flex;
+	flex-direction:column;
+}
+
+div[name="lst_loaded_files"]
+{
+	width:33%;
+	min-width:200px;
+	height:15%
+}
+form[name="frm_load_file"]
+{
+	height:5%;
+}
+multi-page[name="mlp"]
+{
+	flex:1;
+}
+
+smallcaps
+{
+	font-variant: small-caps;
+}

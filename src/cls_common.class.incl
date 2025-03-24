@@ -1,0 +1,63 @@
+<?php
+include_once "db.class.php";
+include_once "AjaxResponse.class.php";
+class cls_common
+{
+    public static function table_exists($table) 
+    {
+        $result=dbCon::query("SHOW TABLES LIKE '$table'");
+		
+	return mysqli_num_rows($result) > 0;
+    }
+    public static function construct_table_from_mysql_result($result,...$thead)
+    {
+        $expandable=false;
+        $rv="<table>\n";
+        $rv.="<thead>\n<tr>\n";
+        foreach ($thead as $th)
+        {
+                if ($th[0]=="_EX_")
+                {
+                        $expandable=true;
+                        $rv.="<th expand_column='true' exp_url='$th[1]'>";
+                        continue;
+                }
+
+                $name=$th[0];
+                $capt=$th[1];
+                if ($capt=="")
+                        $capt=$name;
+                $rv.="<th name='$name' caption='$capt'></th>";
+        }
+        $rv.="</tr>\n</thead>\n<tbody>\n";
+
+        while($row=$result->fetch_assoc())
+        {
+                $tr="<tr>";
+
+
+                if ($expandable==true)
+                        $tr.="<td class='lst_expand_c exp'></td>";
+                foreach ($thead as $th)
+                {
+                        if ($th[0]!="_EX_")
+                        {
+                                $colname=$th[2];
+                                $tr.="<td>".$row[$colname]."</td>";
+                        }
+                }
+                $tr.="</tr>\n";
+                if ($expandable==true)
+                {
+                        if ($thead[0][2]==1)
+                                $tr.="<tr class='lst_expanded_row' style='display:none'><td class='exp_td' colspan='100'>\n\t ".
+                                call_user_func($thead[0][1],$row). " \n</td></tr>\n";
+                }
+
+                $rv.=$tr;
+        }
+
+        $rv.="</tbody>\n</table>";
+        return $rv;
+    }
+}

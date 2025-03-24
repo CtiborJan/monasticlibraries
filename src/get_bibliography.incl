@@ -1,0 +1,66 @@
+<?php
+
+include_once "show_errors.incl";
+include_once "AjaxResponse.incl";
+include_once "db_access.incl";
+
+function write_out_bibl($tmp)
+{
+	global $mysqli;
+	$ajax=new AjaxResponse();
+	
+
+	$h=array();
+	$h[]=$_REQUEST["h1"];
+	$h[]=$_REQUEST["h2"];
+	$h[]=$_REQUEST["h3"];
+	$r=$_REQUEST["r"];
+
+	$h_filter_arr=array();
+
+	for ($i=0;$i<3;$i++)
+	{
+		if ($h[$i]!="")
+			$h_filter_arr[]="h".($i+1)." like '$h[$i]%'";
+	}
+
+	$h_filters=implode(" and ",$h_filter_arr);
+
+	if ($h_filters!="")
+		$where=" where ".$h_filters;
+
+	if (isset($tmp)==false)
+	{
+		if (isset($_REQUEST["tmp"])==true)
+			$tmp=$_REQUEST["tmp"];
+		else
+			$tmp=false;
+	}	
+	if ($tmp=="true" || $tmp==true)
+		$db="tmp_bibliografie";
+	else
+		$db="bibliografie";
+
+	if (table_exists($db))
+	{
+
+		$q="select * from ".$db." ".$where;
+
+		$result=$mysqli->query("select * from ".$db." ".$where);
+		$rv= "<table>";
+		$rv.= "<thead><tr><td name='country' caption='Country'></td><td name='order' caption='Order'></td><td name='place' caption='Place'></td><td name='book' caption='Book'></td></tr></thead>";
+		while($row=$result->fetch_assoc())
+		{
+			$rv.= "<tr><td>".$row["h1"]."</td><td>".$row["h2"]."</td><td>".$row["h3"]."</td><td>".$row["zaznam"]."</td></tr>\n";
+		}
+		$rv.="</table>";
+		//echo "<table><item>f</item></item>f2</item></table>";
+		return $rv;
+	}
+}
+function table_exists($table) {
+	global $mysqli,$ajax;
+	//$ajax->respond("info","SHOW TABLES LIKE $table");
+	$result=$mysqli->query("SHOW TABLES LIKE '$table'");
+  return mysqli_num_rows($result) > 0;
+}

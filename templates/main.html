@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<base href="http://localhost/monasticlibraries/"></base>
+		<link rel="stylesheet" href="public/css/main.css"></link>
+		<title><?php echo $pageTitle ?></title>
+	</head>
+	<body>
+		<div id="container" name="container">
+			<div id="menu_box">
+				<div name="image_box"></div>
+				<div name="menu">
+					<ul>
+						<li name="mnu_manuscripts" data-page="manuscripts"><a href="manuscripts">Manuscripts</a></li>
+						<li name="mnu_bibliography" data-page="bibliography"><a href="bibliography">Bibliography</a></li>
+						<li name="mnu_people" data-page="people"><a href="people">People</a></li>
+						<li name="mnu_about" data-page="about"><a href="about">About the project</a></li>
+					</ul>
+				</div>
+			</div>
+			<div name="content_box">
+				<?php 
+					echo $templateContent;
+				?>
+			</div>
+		</div>
+		<script type="module">
+		import {List_Box} from "./public/js/Controls/ListBox.js";
+		import * as WebCtrl from "./public/js/Controls/functions.js";
+		class Menu
+		{
+			constructor()
+			{
+				WebCtrl.populatePageObject({root:"menu_box",obj:this,flatten:true});
+				var subpage="";
+				window.location.pathname.split("/").forEach((e)=>{if (e!="") subpage=e});
+				this["mnu_"+subpage].classList.add("active");
+			}
+		};
+
+		var menu=new Menu();
+		</script>
+	</body>
+</html>

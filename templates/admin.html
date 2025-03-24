@@ -1,0 +1,62 @@
+<html>
+<head>
+<meta charset="UTF-8"> 
+<title>Monastic libraries ADMIN</title>
+<link href="../public/css/main.css" rel="stylesheet">
+<link href="../public/css/AjaxResponseInfo.css" rel="stylesheet">
+<script type="module" src="../public/js/userform.js"></script>
+</head>
+<body>
+    
+<div id="main">
+    <multi-page>
+        <div page_caption="Bibliografie">
+
+		<div style="max-height:33%;overflow:scroll">
+			<list-box name="lst_loaded_files" column_filters="false">
+			<?php
+				echo $files_table
+			?>
+			</list-box>
+		</div>
+		<div><button name="btn_delete_all">Smaž vše</button></div>
+		<form name="frm_load_file" enctype="multipart/form-data">
+			<file-box name="fil_select_file" caption="Vyber soubor(y) k nahrání" multiple="true"></file-box>
+			<button type="submit" name="btn_upload">Nahrát</button>
+			<span><?php echo $upload_notice?></span>
+		</form>
+		<div><button name="btn_process">Zpracuj nahraná data</button></div>
+		<multi-page name="mlp">
+			<div page_caption="Výsledek zpracování">
+				<?php echo $tmp_data ?>
+			</div>
+			<div page_caption=" - převod -> ">
+				<button name="btn_copy">Zkopíruj data z dočasné do hlavní databáze</button>
+			</div>
+			<div page_caption="Aktuálně nahraná data">
+				<?php echo $real_data ?>
+			</div>
+		</multi-page>
+                
+	</div>
+        <div page_caption="Rukopisy">
+        
+        </div>
+    </multi-page>
+</div>
+        <script type="module">
+            import {Multi_Page} from "./public/js/Controls/MultiPage.js";
+            import {List_Box} from "./public/js/Controls/ListBox.js";
+            import * as WebCtrl from "./public/js/Controls/functions.js";
+            class Menu
+            {
+                    constructor()
+                    {
+                            WebCtrl.populatePageObject({root:"main",obj:this,flatten:true});
+                    }
+            };
+
+            var menu=new Menu();
+        </script>
+</body>
+</html>
