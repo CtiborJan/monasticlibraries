@@ -8,35 +8,35 @@
     <xsl:template match="//w:body">
 		<xsl:for-each select="w:p">
 			<xsl:choose>
-				<xsl:when test=".//w:b">
-					<xsl:if test=".//w:t !=''">
+				<xsl:when test=".//w:r/w:rPr/w:b[not(@w:val)] or .//w:r/w:rPr/w:b[@w:val='true']"><!-- je to boldem -->
+					<xsl:if test=".//w:t !=''"><!-- není to prázdný řádek -->
 						<xsl:choose>
-							<xsl:when test=".//w:jc/@w:val = 'center'">
+							<xsl:when test=".//w:jc/@w:val = 'center'"> <!-- vycentrované = nadpis skupiny -->
 		SKUPINA:
 							</xsl:when>
-							<xsl:otherwise>
+							<xsl:otherwise> <!-- jinak bold = hlavička rukopisu -->
 			RUKOPIS:
-								<xsl:if test=".//w:r/w:rPr/w:i">
+								<xsl:if test=".//w:r/w:rPr/w:i"> <!-- kurzívou = umístění není jisté-->
 									{nejisté umístění}
 								</xsl:if>
 							</xsl:otherwise>
 						</xsl:choose>
 				<xsl:apply-templates match=".//w:r"/>
 				SIGNATURA:
-					<xsl:value-of select="php:function('rkp_signatura',.//w:t/text())"/>
+					<xsl:value-of select="php:function('rkp_signatura',.//w:t/text())"/>  <!-- signatura je za umístěním rukopisu na řádku boldem -->
 					</xsl:if>
 				</xsl:when>
-				<xsl:when test="./preceding-sibling::w:p[1]//w:b">
+				<xsl:when test="./preceding-sibling::w:p[1]//w:r/w:rPr/w:b[not(@w:val)] or ./preceding-sibling::w:p[1]//w:r/w:rPr/w:b[@w:val='true']">	<!-- předchozí řádek je boldem = jsme na řádku s popisem rukopisu-->
 				POPIS:
 					<xsl:apply-templates match=".//w:r"/>
 				</xsl:when>
-				<xsl:when test="starts-with(.//w:t[1]/text(),'http')">
+				<xsl:when test="starts-with(.//w:t[1]/text(),'http')">  <!-- řádek obsahuje url adresu -->
 				URL:
 					<xsl:apply-templates match=".//w:r"/>
 				</xsl:when>
-				<xsl:when test=".//text()!=''">
+				<xsl:when test=".//text()!=''">   <!-- ostatní řádky = záznamy -->
 					ZÁZNAM:
-						<xsl:if test=".//w:r/w:rPr/w:color">
+						<xsl:if test=".//w:r/w:rPr/w:color[@w:val != '000000' and @w:val !='auto']">
 							{inkunábule}
 						</xsl:if>
 						<xsl:apply-templates match=".//w:r"/>

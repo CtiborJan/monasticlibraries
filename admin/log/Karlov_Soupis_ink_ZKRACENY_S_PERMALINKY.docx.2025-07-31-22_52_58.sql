@@ -1,0 +1,7 @@
+insert into tmp_rukopisy (nazev,signatura,popis,misto_vzniku,obdobi,skupina,url,pozn) values 
+('Praha, Knihovna Akademie věd České republiky, 2 TB 2','2 TB 2','Itálie (Brescia), 1496, pap., 271 + I ff. 2° (43 × 28,5 cm), vazba soudobá','Itálie (Brescia)','1496','1','https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-KNAVCR2_TB_2______43CLCN6-cs','N'),
+('Praha, Národní knihovna České republiky, 41 C 25','41 C 25','I. 1r–120v: [Guilermus: Postilla super epistolas et evangelia]','','','1','',''),
+('Praha, Národní knihovna České republiky, 41 E 2','41 E 2','Německo (Kolín nad Rýnem), 1489, pap., I + 231 + I ff. 2° (30 × 22 cm), vazba mladší','Německo (Kolín nad Rýnem)','1489','1','',''),
+('Praha, Národní knihovna České republiky, 42 A 14','42 A 14','Francie (Štrasburk), 1491, pap., I + 97 + 48 + I ff. 2° (41 × 29 cm), vazba mladší','Francie (Štrasburk)','1491','1','','N'),
+('Praha, Národní knihovna České republiky, 42 A 15','42 A 15','Německo (Špýr), 1492, pap., I + 273 + I ff. 2° (40,5 × 29 cm), vazba mladší','Německo (Špýr)','1492','1','','N'),
+('Praha, Královská kanonie premonstrátů na Strahově – Strahovská knihovna, DP VI 20','DP VI 20','Švýcarsko (Basilej), 1495, pap., 294 ff. 2° (31 × 21,5 cm), ilum., vazba soudobá','Švýcarsko (Basilej)','1495','1','','')

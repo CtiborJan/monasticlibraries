@@ -1,39 +1,135 @@
 import * as InputBoxes from "./InputBoxes.js";
+import * as WebPage from "./functions.js";
+class One_Page extends HTMLElement
+{
+    constructor()
+    {
+        super();
+    }
+    connectedCallback()
+    {
+         this.shadowDOM=this.attachShadow({mode:'open'});
+         this.shadowDOM.innerHTML=
+         `
+            <style>
+                :host
+                {
+                    width:100%;
+                    height:100%;
+                    display:none;
+                }
+                :host(.active)
+                {
+                    display:block;
+                }
+             </style>
+            <slot></slot>`;
+    }
+}
+customElements.define("one-page",One_Page);
+
+class Multi_Page_Switch_Strip extends HTMLElement
+{
+    constructor()
+    {
+        super();   
+        this.tabs=[];
+        this.onTabActivated=null;
+        this.onTabDeactivated=null;
+    }
+    connectedCallback()
+    {
+        this.shadowDOM=this.attachShadow({mode:'open'});
+        this.shadowDOM.innerHTML=
+        `<style>
+            div
+            {
+                display:inline-block;
+                padding:0 10 0 10;
+                border:1px dotted lightgray;
+                color:gray;
+                cursor:default;
+            }
+            div.active
+            {
+                border-style:solid;
+                border-bottom:2px solid white;
+                color:black;
+            }
+        </style>
+        `;
+        WebPage.populatePageObject({root:this.shadowDOM,obj:this,flatten:true});
+    }
+    add(name,caption,position=-1)
+    {
+        var d=document.createElement("div");
+        d.innerHTML=caption;
+        d.pageName=name;
+        d.setAttribute("name","tab");
+        d.name="tab";
+        this.tabs.push(d);
+        if (position==-1)
+            this.shadowDOM.appendChild(d);
+        WebPage.populatePageObject({root:d,obj:this,flatten:true});
+    }
+    tab__onclick=(e)=>
+    {
+        this.activate(e.target.pageName,true);
+    }
+    activate(name,triggerEvents=false)
+    {
+        var activated=false;
+        for (let t of this.tabs)
+        {
+            if (t.pageName==name)
+            {
+                t.classList.add("active");
+                activated=true;
+            }
+            else
+            {
+                if (t.classList.contains("active"))
+                {
+                    if (triggerEvents==true)
+                    {
+                        var ce=new CustomEvent("TabDeactivated",
+                        {composed:true,detail:{name:name}});
+                        this.dispatchEvent(ce);
+                    }
+                }
+                t.classList.remove("active");
+            }
+        }
+        if (activated==true)
+        {
+            if (triggerEvents==true)
+            {
+                var ce=new CustomEvent("TabActivated",
+                {composed:true,detail:
+                    {name:name}
+                });
+                this.dispatchEvent(ce);
+            }
+        }
+    }
+}
+
+customElements.define("multi-page-switch-strip",Multi_Page_Switch_Strip);
+
 class Multi_Page extends HTMLElement
 {
 	constructor()
 	{
-		super();
-
-		this.switch_strip=document.createElement("div");
-		this.switch_strip.classList.add("mpg-switch_strip");
-		this.content_holder=document.createElement("div");
-		this.content_holder.classList.add("mpg-content_holder");
-
-		this.name=this.getAttribute("name");
-		if (this.name=="")
-			this.name="mpg";
-		
+		super();		
 		this.pages=[];
-		this.style=document.createElement("style");
-		
-		
-		
-		while(this.children[0]!=null)
-		{
-			let ch=this.children[0];
-			if (ch.nodeName=="DIV")
-			{
-				this.content_holder.appendChild(ch);
-				var new_page=this.add_page({"caption":ch.getAttribute("caption"),"name":ch.getAttribute("page_name"),existing_container:ch});
-			}
-			else
-				ch.remove();
-		}
-		//this.insertBefore(this.style,this.children[0]);
-		this.innerHTML=`
-		<style>
-		multi-page
+                this.page_counter=0;
+	}
+	connectedCallback()
+	{
+            this.shadowDOM=this.attachShadow({mode:'open'});
+            this.shadowDOM.innerHTML=
+            `<style>
+		:host
 		{
 			display:flex;
 			flex-direction:column;
@@ -71,13 +167,22 @@ class Multi_Page extends HTMLElement
 			border:1px solid lightgray;
 		}
 		</style>
-		`;
-
-	}
-	connectedCallback()
-	{
-		this.appendChild(this.switch_strip);
-		this.appendChild(this.content_holder);
+             <multi-page-switch-strip name='switch_strip'></multi-page-switch-strip>
+             <div class='mpg-content_holder' name='container'>
+                <slot></slot>
+            </div>`;
+        
+            WebPage.populatePageObject({root:this.shadowDOM,obj:this,flatten:true,log:true});
+            WebPage.populatePageObject({root:this,obj:this,flatten:true});
+            for (let ch of this.children)
+            {
+                if (ch.nodeName=="ONE-PAGE")
+                {
+                    this.addPage(ch);
+                }
+            }
+            this.activatePage(0);
+                
 	}
 	static get observedAttributes()
 	{
@@ -85,15 +190,15 @@ class Multi_Page extends HTMLElement
 	}
 	attributeChangedCallback(name, oldValue, newValue)
 	{
-		switch (name)
-		{
-			case "tabs_visible":
-				if (newValue=="false")
-					this.switch_strip.style.display="none";
-				else
-					this.switch_strip.style.display="block";	
-				break;
-		}		
+            switch (name)
+            {
+                case "tabs_visible":
+                    if (newValue=="false")
+                        this.switch_strip.style.display="none";
+                    else
+                        this.switch_strip.style.display="block";	
+                    break;
+            }		
 	}
 	set tabs_visible(newValue)
 	{
@@ -103,75 +208,49 @@ class Multi_Page extends HTMLElement
 	{
 		return this.switch_strip.style.display!="none";
 	}
-	add_page=(args)=>
-	{
-		var me=this;
-		if (args.name=="" || args.name==undefined)
-			args.name=this.name+"_page_"+(this.pages.length+1);
-
-		var page=
-		{
-			name:args.name,
-			radio:null,
-			container:null,
-			active:null,
-			caption:args.caption,
-			activate:function()
-			{
-				this.container.style.display="";
-				this.radio.checked=true;
-				for (let p of me.pages)
-				{
-					if (p!==this)
-						p.deactivate();
-				}
-			},
-			deactivate:function()
-			{
-				this.container.style.display="none";
-				this.radio.checked=false;
-			}
-		};
-
-		if (args.existing_container!==undefined && args.existing_container!==null)
-		{
-			if (args.existing_container.hasAttribute("page_caption"))
-				args.caption=args.existing_container.getAttribute("page_caption");
-			if (args.existing_container.hasAttribute("page_name"))
-				args.name=args.existing_container.getAttribute("page_name");
-		}
-
-		page.radio=document.createElement("radio-box");
-		page.radio.setAttribute("name",this.name+"_switch_rbt");
-		page.radio.setAttribute("caption",args.caption);
-		
-
-
-		var me=this;
-		
-
-		
-		page.radio.associated_page=page;
-		if (args.existing_container===undefined || args.existing_container===null)
-			page.container=document.createElement("div");
-		else
-			page.container=args.existing_container;
-
-		page.radio.addEventListener("change",function(e)
-		{
-			var rbt=e.currentTarget;
-			if (rbt.checked==true)
-				rbt.associated_page.activate();
-		});
-		
-		this.pages.push(page);
-		
-
-		this.switch_strip.appendChild(page.radio);
-		this.content_holder.appendChild(page.container);
-		page.activate();
-		return page.container;
-	}
+        addPage=(page)=>
+        {
+            this.pages.push(page);
+            this.page_counter++;
+            var caption=page.getAttribute("caption");
+            var name=page.getAttribute("name");
+            if (name=="")
+            {
+                name=this.name+"_page_"+this.page_counter;
+                page.setAttribute("name",name);
+                page.name=name;
+            }
+            this.switch_strip.add(name,caption);
+            WebPage.populatePageObject({root:page,obj:this,flatten:true});
+        }
+        switch_strip__onTabActivated=(e)=>
+        {
+            this.activatePage(e.detail.name);
+        }
+        activatePage(id)
+        {
+            var name="";
+            var index=-1;
+            var activatedName="";
+            if (typeof id=="string")
+                name=id;
+            else if (typeof id=="number")
+                index=id;
+            
+            for (let i=0;i<this.pages.length;i++)
+            {
+                if ((name!="" && this.pages[i].getAttribute("name")==name) || 
+                        index == i)
+                {
+                    this.pages[i].classList.add("active");
+                    activatedName=this.pages[i].getAttribute("name");
+                }
+                else
+                    this.pages[i].classList.remove("active");
+            }
+            this.switch_strip.activate(activatedName);
+        }
+	
 	page=(arg)=>
 	{
 		if (typeof(arg)==="number")

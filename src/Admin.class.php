@@ -1,20 +1,24 @@
 <?php
-include_once "AjaxResponse.incl";
+/*
+ * helper class for admin providing functionalities for both bibliography and manuscripts admin
+ * Serves as parent class for M and B controllers
+ */
+include_once "ServerResponse.class.php";
 include_once "db.class.php";
-include_once "cls_bibliography.incl";
-include_once "cls_manuscripts.incl";
+include_once "bibliography.model.php";
+include_once "manuscripts.model.php";
 
 class cls_admin
 {
-	public function __construct()
-	{
-		
-	}
-	
-	public static function make_files_table($folder)
+        public static function make_files_table($folder)
 	{
 		$files=self::list_files($folder);
-		$rv="<table><thead><tr><th caption='Jméno souboru'></th><th caption='Datum'></th><th caption='Velikost'></th><th caption='' caption='delete' width='21px'></th></tr></thead>\n";
+		$rv="<list-box name='lst_loaded_files'>\n<table>\n<thead><tr>"
+                        . "<th caption='Jméno souboru'></th>"
+                        . "<th caption='Datum'></th>"
+                        . "<th caption='Velikost'>"
+                        . "</th><th caption='' width='21px'></th></tr></thead>\n"
+                        . "<tbody>";
 		foreach ($files as $file)
 		{
 			$rv.="<tr>";
@@ -23,22 +27,20 @@ class cls_admin
 			$rv.="<td></td>";
 			$rv.="</tr>";
 		}
-		$rv.="</table>";
+		$rv.="</tbody>\n</table>\n</list-box>";
 		return $rv;
 	}
 	public static function list_bibliography($tmp)
 	{
-		$rv='<list-box name="lst_tmp">';
-		$rv.=cls_bibliography::get($tmp);
-		$rv.="</list-box>";
+		$rv=mod_bibliography::get_all($tmp);
 		return $rv;
 	}
 	public static function list_manuscripts($tmp)
 	{
 		$rv="<multi-page name='mlp2'>";
-		$rv.="<div page_caption='Skupiny rukopisů' page_name='grp'><list-box>".cls_manuscripts::get_by_groups($tmp)."</list-box></div>";
-		$rv.="<div page_caption='Rukopisy' page_name='manuscripts'><list-box>".cls_manuscripts::get_mns($tmp)."</list-box></div>";
-		$rv.="<div page_caption='Záznamy' page_name='entries'><list-box>".cls_manuscripts::get_all($tmp)."</list-box></div>";
+		$rv.="<one-page caption='Skupiny rukopisů' name='grp'>".mod_manuscripts::get_collections_ex(["tmp"=>$tmp])."</one-page>";
+		$rv.="<one-page caption='Rukopisy' name='manuscripts'>".mod_manuscripts::get_manuscripts_ex(["tmp"=>$tmp])."</one-page>";
+		$rv.="<one-page caption='Záznamy' name='entries'>".mod_manuscripts::get_records_ex(["tmp"=>$tmp])."</one-page>";
 		$rv.="</multi-page>";
 		return $rv;
 	}
@@ -82,118 +84,189 @@ class cls_admin
 
 class cls_upload
 {
-	public $basedir="/var/www/html/monasticlibraries/admin/bibliografie";
-    public function __construct() 
+    /*
+     *  třída starající se o nahrání docx souborů z uživatelova disku 
+     * a rovnou i extrakci xml z nich
+     */
+    public static $basedir="/var/www/html/monasticlibraries/admin/";
+
+    public static function delete_file($folder,$names)
     {
-        global $ajax;        
+        if ($names==null)
+        {//=delete whole folder
+            $names=scandir($folder."/files");            
+        }
+        foreach ($names as $name)
+        {
+            if ($name!="." && $name!="..")
+            {
+                unlink($folder."/files/".$name);
+                unlink($folder."/unzipped/$name/document.xml");
+                rmdir($folder."/unzipped/".$name);
+                ServerResponse::add_message("info", $folder."/files/".$name);
+            }
+        }
+        ServerResponse::respond("info","Soubory ".implode(", ",$names)." ve složce smazány");
     }
-    public function delete_file()
+    public static function upload_files($folder)
     {
-		$names=explode(";",$_REQUEST["delete_file"]);
-		foreach ($names as $name)
-		{
-			unlink($basedir."/files/".$name);
-			rmdir($basedir."/unzipped/".$name);
-		}
-		$ajax->respond("info","Soubory ".implode(", ",$names)." smazány");
+        if ($folder=="bibliography")
+        {
+            rrmdir($folder."/files");
+            mkdir($folder."/files");
+            rrmdir($folder."/unzipped");
+            mkdir($folder."/unzipped");
+            //chmod($folder."/unzipped",0777);
+        }
+        for ($i=0;$i<sizeof($_FILES["files"]["name"]);$i++)
+        {
+            $original_name=$_FILES["files"]["name"][$i];
+            $tmp_name=$_FILES["files"]["tmp_name"][$i];
+            $new_name=$original_name.".".date("Y-m-d-H_i_s");
+            move_uploaded_file($tmp_name,$folder."/files/".$new_name);
+            $unzipped_path= cls_unpack_docx::unpack($folder."/files/$new_name",$folder."/unzipped");
+        }
+        ServerResponse::respond("info","Extracted to $unzipped_path");
+        /*$rv=create_tables("bibliografie","tmp_");
+        parse_docx($unzipped_path,"bibliografie");*/
     }
-    public function upload_files()
+    
+}
+
+class cls_unpack_docx
+{
+
+    public static function unpack($file,$folderTo)
     {
-        foreach (scandir($basedir."/files") as $f)
-		{
-			unlink($basedir."/files/" . $f);
-		}
-	
-		$original_name=$_FILES["fil_select_file"]["name"];
-		$name=$_FILES["fil_select_file"]["name"].".".date("Y-m-d-H_i_s");
-		move_uploaded_file($_FILES["fil_select_file"]["tmp_name"],$basedir."/files/".$name);
-		$unzipped_path=unzip_docx($basedir."/files/$name",$basedir."/unzipped");
-		
-		$rv=create_tables("bibliografie","tmp_");
-		parse_docx($unzipped_path,"bibliografie");
-		$ajax->add_message("info",$rv);
+        $zip=new ZipArchive;
+        $zip_open=$zip->open($file);
+        ServerResponse::info("Otevírám zip soubor: $file");
+        if ($zip_open===true)
+        {
+            $index=$zip->locateName("word/document.xml");
+            if ($index!==false)
+            {
+                $document=$zip->getFromName("word/document.xml");
+                $document=str_replace("<w:p>","\n<w:p>",$document);
+                mkdir($folderTo."/".basename($file));
+                ServerResponse::info($folderTo."/".basename($file));
+                $unziped_folder_path=$folderTo."/".basename($file);
+                $unzipped_path=$unziped_folder_path."/document.xml";
+                chmod($unziped_folder_path,0777);
+                file_put_contents($unzipped_path,$document);
+
+                if (file_exists($unzipped_path))
+                {
+                    ServerResponse::info('Extrahování souboru ok');
+                    chmod($unzipped_path,0777);
+                    return $unzipped_path;
+                }
+                else
+                    ServerResponse::respond("error","Extrahování souboru se nezdařilo");
+            }
+            else
+                ServerResponse::respond("error",'$index==false, soubor document.xml v archivu nenalezen');
+        }
+        else
+            ServerResponse::respond("error",'Selhalo otevření archivu ' .$file. " Chyba: $zip_open");
     }
 }
 
 class cls_extract_data
 {
-
-    function create_tables($type,$tmp="")
+/*
+ *  třída zajišťující samotnou extrakci dat z XML souboru extrahovaného z Wordu
+ */
+    private static $sine_sig_counter=0;
+    public static function create_tables($type,$tmp="")
     {
-	global $mysqli,$ajax;
-
-	if ($mysqli==null)
+        if ($tmp===false)
+            $tmp="";
+        else if ($tmp===true)
+            $tmp="tmp_";
+        
+	if ($type=="manuscripts")
 	{
-		$ajax->respond("error","mysqli==null");
-	}
+            dbCon::query("drop table if exists ".$tmp."skupiny_rkp");
+            dbCon::query("drop table if exists ".$tmp."rukopisy");
+            dbCon::query("drop table if exists ".$tmp."zaznamy");
 
-	if ($type=="rkp")
-	{
-		$mysqli->query("drop table if exists ".$tmp."skupiny_rkp");
-		$mysqli->query("drop table if exists ".$tmp."rukopisy");
-		$mysqli->query("drop table if exists ".$tmp."zaznamy");
-
-		$mysqli->query("create table ".$tmp."skupiny_rkp (id int, nazev varchar(1000), misto varchar(250))");
-		$mysqli->query("create table ".$tmp."rukopisy (nazev varchar(1000), signatura varchar(50), popis varchar(1000), obdobi varchar(100),skupina int,url varchar(1000), pozn varchar(10))");
-		$mysqli->query("create table ".$tmp."zaznamy (nazev varchar(10000), rkp_signatura varchar(250), pozn varchar(10))");
+            dbCon::query("create table ".$tmp."skupiny_rkp (id int auto_increment primary key, nazev varchar(1000), misto varchar(250))");
+            dbCon::query("create table ".$tmp."rukopisy (id int auto_increment primary key, nazev varchar(1000), "
+                    . "signatura varchar(50), popis varchar(1000),misto_vzniku varchar(500), "
+                    . "obdobi varchar(250),skupina int,url varchar(1000), pozn varchar(10))");
+            dbCon::query("create table ".$tmp."zaznamy (id int auto_increment primary key, nazev varchar(10000), rkp_signatura varchar(250), pozn varchar(10))");
 	}
 	else
 	{
-		$mysqli->query("drop table if exists ".$tmp."bibliografie");
+            dbCon::query("drop table if exists ".$tmp."bibliografie");
 
-		$mysqli->query("create table ".$tmp."bibliografie (h1 varchar(500),h2 varchar (500),h3 varchar(500),zaznam varchar(2000))");
+            dbCon::query("create table ".$tmp."bibliografie (h1 varchar(500),h2 varchar (500),h3 varchar(500),zaznam varchar(2000))");
 	}
     }
 
-    function insert_into_db($type,$data,$tmp="")
+    public static function insert_into_db($type,$data,$tmp="")
     {
-
-
-	global $mysqli,$ajax;
-	$ajax->info("Vkládám data do databáze ".$tmp);
-	if ($type=="rkp")
+        $db="";
+	ServerResponse::info("Vkládám data do databáze ".$tmp);
+	if ($type=="manuscripts")
 	{
-
+                
 		$query=$data;
-		$rv=$mysqli->query($query);
+		$rv=dbCon::query($query);
 		if ($rv==true)
-			$ajax->info("úspěšně");
+			ServerResponse::info("úspěšně");
 		else
-			$ajax->error("neúspěšně");
+			ServerResponse::error("neúspěšně");
 
-		$rv=$mysqli->query("select count(*) as count from $tmp;");
+		$rv=dbCon::query("select count(*) as count from $tmp;");
 
 		$row=$rv->fetch_assoc();
-		$ajax->info($row["count"]. " záznamů");
+		ServerResponse::info($row["count"]. " záznamů");
 	}
 	else
 	{
-
-
-		$query="insert into ".$tmp.$type. " values ".$data;
+		$query="insert into ".$tmp."bibliografie values ".$data;
 
 		$fh=fopen("insert.sql","w");
 		fputs($fh,$query);
-		$ajax->info("Vygenerovaný SQL dotaz uložen do souboru insert.sql");
+		ServerResponse::info("Vygenerovaný SQL dotaz uložen do souboru insert.sql");
 
-		$rv=$mysqli->query($query);
+		$rv=dbCon::query($query);
 		if ($rv==true)
-			$ajax->info("úspěšně");
+			ServerResponse::info("úspěšně");
 		else
-			$ajax->error("neúspěšně");
-		$mysqli->query("delete from ".$tmp.$type. " where zaznam=''");
+			ServerResponse::error("neúspěšně");
+		dbCon::query("delete from ".$tmp."bibliografie where zaznam=''");
 
-		$rv=$mysqli->query("select count(*) as count from tmp_bibliografie;");
+		$rv=dbCon::query("select count(*) as count from tmp_bibliografie;");
 		$row=$rv->fetch_assoc();
-		$ajax->info($row["count"]. " záznamů");
+		ServerResponse::info($row["count"]. " záznamů");
 	}
 
     }
 
-
-    function parse_docx($xmlfile,$type="")
+    public static function process($folder)
     {
-	global $id_skupiny,$ajax;
+        ServerResponse::open_log("log");
+        self::create_tables($folder,"tmp_");
+        $files=scandir($folder."/unzipped");
+        foreach ($files as $f)
+        {
+            ServerResponse::info("Zpracovávám dokument $folder/unzipped/$f");
+            if ($f!="." && $f!="..")
+                self::parse_docx($folder."/unzipped/".$f."/document.xml",$folder,$f);
+        }
+    }
+
+    public static function parse_docx($xmlfile,$type="",$orig_filename)
+    {
+        global $id_skupiny;
+        ServerResponse::info("parsing $xmlfile");
+
+                
+        if (file_exists($xmlfile)==false)
+            ServerResponse::respond ("error","Nenalezen výchozí XML soubor $xmlfile");
 
 	$next_l=function($lines,&$index)
 	{
@@ -204,19 +277,24 @@ class cls_extract_data
 		}
 		return replace_quotes(trim($lines[$index]));
 	};
-
 	$xsl_doc = new DOMDocument();
-	$xsl_doc->load("word_transform_".$type.".xsl");
+        $xsl_doc_path="xslt/word_transform_".$type.".xsl";
+	$xsl_doc->load($xsl_doc_path);
+        if ($xsl_doc==false)
+            ServerResponse::respond("error","Nepodařilo se nahrát XSLT soubor: $xsl_doc_path");
 	//$xsl_doc->load("word_transform_bibliografie.xsl");
 
 	$xml_doc = new DOMDocument();
 	$xml_doc->load($xmlfile);
 
-
 	if ($xml_doc==false || $xsl_doc==false)
 	{
-		$ajax->respond("error","Nepodařilo se nahrát XML","error");
+		ServerResponse::respond("error","Nepodařilo se nahrát XML","error");
 	}
+        
+        /*  XSLT transformace udělá jenom část práce, dostat to skrze XSL do SQL 
+         *  je spíš iluzorní, takže se to poté ještě znovu projde a zpracuje v php
+         */
 	$proc = new XSLTProcessor();
 	$proc->registerPHPFunctions();
 	$proc->importStylesheet($xsl_doc);
@@ -224,28 +302,34 @@ class cls_extract_data
 
 
 	$rv=$newdom->saveXML();
-
-	$fh=fopen("post_transform","w");
+        
+        if (file_exists("log")==false)
+        {
+            mkdir("log");
+            chmod("log",0777);
+        }
+        
+	$fh=fopen("log/$orig_filename.post_transform","w");
 	fputs($fh,$rv);
 	fclose($fh);
 
-	if ($type=="rkp")
+	if ($type=="manuscripts")
 	{
-		$this->create_tables($type,"tmp_");
-
-		$sql_skupiny_head="insert into tmp_skupiny_rkp (id, nazev, misto) values ";
+		$sql_skupiny_head="insert into tmp_skupiny_rkp (nazev, misto) values \n";
 		$sql_skupiny=[];
-		$sql_rkp_head="insert into tmp_rukopisy (nazev,signatura,popis,obdobi,skupina,url,pozn) values ";
+		$sql_rkp_head="insert into tmp_rukopisy (nazev,signatura,popis,misto_vzniku,obdobi,skupina,url,pozn) values \n";
 		$sql_rkp=[];
 		$sql_rkp_row="";
-		$sql_rkp_del=
-		$sql_zaznam_head="insert into tmp_zaznamy (nazev,rkp_signatura) values ";
+		#$sql_rkp_del=
+		$sql_zaznam_head="insert into tmp_zaznamy (nazev,rkp_signatura,pozn) values \n";
 		$sql_zaznam=[];
 		$lines=explode("\n",$rv);
 		$signatura="";
 		$last="";
 		$counter=0;
 		$R_to_be_closed=false;
+                
+                //zde se zpracovává výsledek XSL transformace
 		for ($i=1;$i<sizeof($lines);$i++)
 		{
 			$counter++;
@@ -261,66 +345,123 @@ class cls_extract_data
 					$R_to_be_closed=true;
 					$last="R";
 					//$l=trim($lines[++$i]);
-					$sql_rkp=array("''","''","''","''","''","''","''");
+					$sql_rkp=array("''","''","''","''","''","''","''","''");
 
 					$j=$i;
 					$l=$next_l($lines,$i);
 					if ($l=="{nejisté umístění}")
-						$sql_rkp[6]="'N'";
+						$sql_rkp[7]="'N'";
 					else
 						$i=$j;
 
 					$l=$next_l($lines,$i);
 					$sql_rkp[0]="'$l'";
 
-
-
-
-
-
-
 				}
 				else if ($l=="URL:" && $last=="R")
 				{
 					$l=$next_l($lines,$i);
-					$sql_rkp[5]="'$l'";
+					$sql_rkp[6]="'$l'";
 				}
 				else if ($l=="SIGNATURA:" && $last=="R")
 				{
 					//$l=trim($lines[++$i]);
 					$l=$next_l($lines,$i);
-					$sql_rkp_row.='"'.$l.'",';
-					$sql_rkp[1]="'$l'";
+                                        //?delendum$sql_rkp_row.='"'.$l.'",';
+                                        if ($l=="sine sig.")//rukopis bez signatury
+                                        {
+                                            self::$sine_sig_counter++;
+                                            $l="(sine sig.{".self::$sine_sig_counter."})";
+                                        }
+					
 					$signatura=$l;
+                                        $signatura="{".$id_skupiny."}".$signatura;
+                                        $sql_rkp[1]="'$signatura'";
 				}
 				else if ($l=="POPIS:" && $last=="R")
 				{
 					//$l=trim($lines[++$i]);
 					$l=$next_l($lines,$i);
-					$sql_rkp_row.='"'.$l.'",';
+					//?delendum$sql_rkp_row.='"'.$l.'",';
 					$sql_rkp[2]="'$l'";
 
-					$segm=explode(",",$l);
-					$datace=trim($segm[1]);
+                                        /*  datace - není to tak jednoduché: první segment je místo vzniku
+                                         *  které má někdy podobu: Německo (Norimberk, Augsburg), tedy dělelní 
+                                         *  podle čárek nelze jednoduše použít.
+                                         *  Ale místo vzniku chceme (nově) také extrahovat, tedy budeme postupovat jinak
+                                         */ 
+                                        
+                                        $segm=[];
+                                        $p=0;
+                                        $br_count=0;//počet otevřených závorek
+                                        
+					for ($k=0;$k<strlen($l);$k++)
+                                        {
+                                            if ( preg_match("/[[({]/",$l[$k])!==0)
+                                                $br_count++;
+                                            else if ( preg_match("/[\]})]/",$l[$k])!==0)
+                                                $br_count--;
+                                            
+                                            
+                                            if (($l[$k]=="," ||$k==strlen($l)-1) && $br_count==0)
+                                            {
+                                                if ($k==strlen($l)-1)
+                                                {// musíme ošetřit poslední segment (dataci) v případech, kdy delší popis chybí (např. Čechy, XIV)
+                                                    $k++;
+                                                }
+                                                $ac_segm=trim(substr($l, $p, $k - $p ));
+                                                $segm[]= $ac_segm;
+                                                $p=$k+1;
+                                            }
+                                        }
+                                        $misto=[];
+                                        $datace="";
+                                        $lands=explode(" ",
+                                                "Europe Czech German France Italy Austria Spain Poland Hungary Switzerland Netherland Silesia");
+                                        foreach ($segm as $s)
+                                        {
+                                            foreach ($lands as $land)
+                                            {
+                                                if (strstr($s,$land)!=false)
+                                                {
+                                                    $misto[]=$s;
+                                                    continue 2;
+                                                }
+                                            }
+                                            
+                                            
+                                            if (preg_match("/(\s*I?X[IV]+)|(\s*1[0-9]{3}|\s*[789][0-9]{2})/",$s)==1 
+                                                    && strstr($segm[0],"fragment")==false && $datace=="")
+                                            {
+                                                $datace=$s;
+                                            }
+                                        }
+                                        if (sizeof($misto)==0)
+                                            $misto[]="?";
+                                        $misto_str=implode(", ",$misto);
+                                        $sql_rkp[3]="'".$misto_str."'";
+					$sql_rkp[4]="'$datace'";
+					$sql_rkp[5]="'$id_skupiny'";
 
-					$sql_rkp[3]="'$datace'";
-					$sql_rkp[4]="'$id_skupiny'";
-
-					$sql_rkp_row.='"'.$datace.'",'.$id_skupiny.')';
-
-
+					//delendum?$sql_rkp_row.='"'.$datace.'",'.$id_skupiny.')';
 
 				}
 				else if ($l=="ZÁZNAM:" && $last=="R")
 				{
 					if ($R_to_be_closed==true)
-					{
+					{/*máme všechny řádky k popisu rukopisu,
+                                          *které potřebujeme (odkaz totiž je na samostatném řádku!)
+                                          * a tak uzavřeme sql pro rukopis 
+                                          */
 						$sql_rkp_lines[]="(".implode(",",$sql_rkp).")";
 						$R_to_be_closed=false;
 					}
+                                        $flags="";
 					//$l=trim($lines[++$i]);
 					$l=$next_l($lines,$i);
-					$sql_zaznam[]='("'.replace_quotes($l).'","'.$signatura.'")';
+                                        if ($l=="{inkunábule}")
+                                            $flags.="i";
+					$sql_zaznam[]='("'.replace_quotes($l).'","'.$signatura.'","'.$flags.'")';
 				}
 
 				else if ($l=="SKUPINA:")
@@ -329,91 +470,76 @@ class cls_extract_data
 					$id_skupiny++;
 					//$l=trim($lines[++$i]);
 					$l=$next_l($lines,$i);
-					$sql_skupiny[]='('.$id_skupiny.',"'.$l.'","")';
+					$sql_skupiny[]='("'.$l.'","")';
 				}
 			}
 		}
+                //echo '$sql_rkp_lines:' .$sql_rkp_lines;
 		$sql_rkp=$sql_rkp_head . implode(",\n",$sql_rkp_lines);
 		$sql_zaznam=$sql_zaznam_head . implode(",\n",$sql_zaznam);
 		$sql_skupiny=$sql_skupiny_head . implode(",\n",$sql_skupiny);
 		//echo $sql_rkp;
 		//die();
-		$this->insert_into_db("rkp",$sql_skupiny,"tmp_skupiny_rkp");
-		$this->insert_into_db("rkp",$sql_rkp,"tmp_rukopisy");
-		$this->insert_into_db("rkp",$sql_zaznam,"tmp_zaznamy");
-		$ajax->respond();
-		#return Array($sql_skupiny,$sql_rkp,$sql_zaznam);
-	}
-	else
-	{
-		$rv_arr=explode("\n",$rv);
-		$rv_arr[0]="";
-		$rv="";
-		for ($i=0;$i<count($rv_arr);$i++)
-		{
-
-			if (trim($rv_arr[$i])!="")
-			{
-
-				if ($rv!="")
-					$rv.=",\n";
-				$rv_arr[$i]=str_replace("\scaps:1","<smallcaps>",$rv_arr[$i]);
-				$rv_arr[$i]=str_replace("\scaps:0","</smallcaps>",$rv_arr[$i]);
-
-				$rv_arr[$i]=str_replace("\i:1","<i>",$rv_arr[$i]);
-				$rv_arr[$i]=str_replace("\i:0","</i>",$rv_arr[$i]);
-				$rv.=$rv_arr[$i];
-			}
-		}
-
-
-		//$rv="insert into tmp_bibliografie (h1,h2,h3,zaznam) values ".trim(implode(",\n",$rv_arr),",\n\r\t\s");
-		//$rv=trim(implode(",\n",$rv_arr),",\n\r\t\s");
-
-		$ajax->info("XSL transformace úspěšná");
-
-
-
-		$this->insert_into_db("bibliografie",$rv,"tmp_");
-	}
-	$fh=fopen("post_transform2","w");
+                
+        $fh=fopen("log/$orig_filename.sql","w");
 	fputs($fh,$sql_rkp);
 	fclose($fh);
+                
+		self::insert_into_db($type,$sql_skupiny,"tmp_skupiny_rkp");
+		self::insert_into_db($type,$sql_rkp,"tmp_rukopisy");
+		self::insert_into_db($type,$sql_zaznam,"tmp_zaznamy");
+		#return Array($sql_skupiny,$sql_rkp,$sql_zaznam);
+	}
+	else//bibliografie
+	{
+            self::create_tables($type,"tmp_");
+            $rv_arr=explode("\n",$rv);
+            $rv_arr[0]="";
+            $rv="";
+            for ($i=0;$i<count($rv_arr);$i++)
+            {
+
+                    if (trim($rv_arr[$i])!="")
+                    {
+
+                            if ($rv!="")
+                                    $rv.=",\n";
+                            $rv_arr[$i]=str_replace("\scaps:1","<smallcaps>",$rv_arr[$i]);
+                            $rv_arr[$i]=str_replace("\scaps:0","</smallcaps>",$rv_arr[$i]);
+
+                            $rv_arr[$i]=str_replace("\i:1","<i>",$rv_arr[$i]);
+                            $rv_arr[$i]=str_replace("\i:0","</i>",$rv_arr[$i]);
+                            $rv.=$rv_arr[$i];
+                    }
+            }
+
+
+            //$rv="insert into tmp_bibliografie (h1,h2,h3,zaznam) values ".trim(implode(",\n",$rv_arr),",\n\r\t\s");
+            //$rv=trim(implode(",\n",$rv_arr),",\n\r\t\s");
+
+            ServerResponse::info("XSL transformace úspěšná");
+
+
+
+            self::insert_into_db($type,$rv,"tmp_");
+	}
+	
     }
 
 }
-
-class cls_unpack_docx
+class cls_tmp_to_def
 {
-
-    function unpack($file,$folderTo)
+    public static function manuscripts()
     {
-        global $ajax;
-        $zip=new ZipArchive;
-        if ($zip->open($file)===true)
-        {
-            $index=$zip->locateName("word/document.xml");
-            if ($index!==false)
-            {
-                $document=$zip->getFromName("word/document.xml");
-                $document=str_replace("<w:p>","\n<w:p>",$document);
-                mkdir($folderTo."/".basename($file));
-                $unzipped_path=$folderTo."/".basename($file)."/document.xml";
-                file_put_contents($unzipped_path,$document);
-
-                if (file_exists($unzipped_path))
-                {
-                    $ajax->add_message("info",'Extrahování souboru ok');
-                    return $unzipped_path;
-                }
-                else
-                    $ajax->respond("error","Extrahování souboru se nezdařilo");
-            }
-            else
-                $ajax->respond("error",'$index==false, soubor document.xml v archivu nenalezen');
-        }
-        else
-            $ajax->respond("error",'Selhalo otevření archivu ' .$file,"error");
+        dbCon::query("drop tables if exists rukopisy, skupiny_rkp, zaznamy;");
+        dbCon::query("create table rukopisy as select * from tmp_rukopisy;");
+        dbCon::query("create table skupiny_rkp as select * from tmp_skupiny_rkp;");
+        dbCon::query("create table zaznamy as select * from tmp_zaznamy;");
+    }
+    public static function bibliography()
+    {
+        dbCon::query("drop table if exists bibliografie;");
+        dbCon::query("create table bibliografie as select * from tmp_bibliografie;");
     }
 }
 
@@ -428,15 +554,40 @@ function replace_quotes($text)
 }
 function rkp_signatura($text)
 {//funkce používaná z XSLT, proto nemůže být členem třídy
-	$t="";
-	for ($i=0;$i<sizeof($text);$i++)
-	{
-		$t.=$text[$i]->textContent;
-	}
-	preg_match("/.*,([^,(]+)/",$t,$m);
-	return $m[1];
+    global $sine_sig_counter;
+    $t="";
+    for ($i=0;$i<sizeof($text);$i++)
+    {
+            $t.=$text[$i]->textContent;
+    }
+    preg_match("/.*,([^,(]+)/",$t,$m);
+    if ($m[1]=="")//signatura chybí! Viz. např. "Neukirchen soupis ink" -> "inkunábule s neznámým místem uložení"
+        return "sine sig.";
+    else
+        return $m[1];
 }
 
+function rrmdir($src)
+    {
+        $dir = opendir($src);
+        while(false !== ( $file = readdir($dir)) ) 
+        {
+            if (( $file != '.' ) && ( $file != '..' )) 
+            {
+                $full = $src . '/' . $file;
+                if ( is_dir($full) ) 
+                {
+                    rrmdir($full);
+                }
+                else 
+                {
+                    unlink($full);
+                }
+            }
+        }
+        closedir($dir);
+        rmdir($src);
+    }
 
 #export to server bibliografie
 #export delete_file(delete_file) to biblio 

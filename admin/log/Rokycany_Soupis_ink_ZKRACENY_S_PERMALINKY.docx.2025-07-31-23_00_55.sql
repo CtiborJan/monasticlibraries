@@ -1,0 +1,6 @@
+insert into tmp_rukopisy (nazev,signatura,popis,misto_vzniku,obdobi,skupina,url,pozn) values 
+('Brno, Moravská zemská knihovna, Mk P 37','Mk P 37','Itálie (Řím), 1472, pap., 261 ff. 2° (40,5 × 28,5 cm), vazba soudobá','Itálie (Řím)','1472','18','https://www.digitalniknihovna.cz/mzk/uuid/uuid:96dedaf1-5ed9-4fe4-b9be-702f6ab9ea01',''),
+('Brno, Moravská zemská knihovna, Mk P 122','Mk P 122','Německo (Norimberk), 1477, pap., I + 395 ff. 2° (29,5 × 21 cm), vazba soudobá','Německo (Norimberk)','1477','18','https://www.digitalniknihovna.cz/mzk/uuid/uuid:01e33406-927a-49bd-8d33-80e2f6b0abe6',''),
+('Praha, Knihovna Národního muzea, Kapucínská knihovna 68','Kapucínská knihovna 68','Švýcarsko (Basilej), 1485, pap., 369 + IV ff. 2° (37 × 25 cm), vazba mladší','Švýcarsko (Basilej)','1485','18','',''),
+('Teplá, kanonie premonstrátů, RF 42','RF 42','Čechy + Německo (Heidelberg), XV + 1485, pap., 288 (recte 285) (rukopisné části) + 104 (tisk) + I ff. 22 × 15 cm, vazba dobová','Čechy + Německo (Heidelberg)','XV + 1485','18','',''),
+('Teplá, kanonie premonstrátů, RF 84','RF 84','Německo (Norimberk), 1497, pap., I + 352 + I ff. 2° (36,5 × 25 cm), vazba soudobá','Německo (Norimberk)','1497','18','','')

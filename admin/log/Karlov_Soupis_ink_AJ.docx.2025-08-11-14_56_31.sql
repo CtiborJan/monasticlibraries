@@ -1,0 +1,7 @@
+insert into tmp_rukopisy (nazev,signatura,popis,misto_vzniku,obdobi,skupina,url,pozn) values 
+('Praha, Knihovna Akademie věd České republiky, 2 TB 2','2 TB 2','Italy (Brescia), 1496, paper, 271 + I ff. 2° (43 × 28,5 cm), medieval binding','Italy (Brescia)','1496','9','https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-KNAVCR2_TB_2______43CLCN6-cs','N'),
+('Praha, Národní knihovna České republiky, 41 C 25','41 C 25','France (Strasbourg) + Germany (Hamburg), 1489 + 1491, paper, 121 + 153 ff. 2° (30 × 21 cm), medieval binding','France (Strasbourg) + Germany (Hamburg)','1489 + 1491','9','',''),
+('Praha, Národní knihovna České republiky, 41 E 2','41 E 2','Germany (Köln), 1489, paper, I + 231 + I ff. 2° (30 × 22 cm), modern binding','Germany (Köln)','1489','9','',''),
+('Praha, Národní knihovna České republiky, 42 A 14','42 A 14','France (Strasbourg), 1491, paper, I + 97 + 48 + I ff. 2° (41 × 29 cm), modern binding','France (Strasbourg)','1491','9','','N'),
+('Praha, Národní knihovna České republiky, 42 A 15','42 A 15','Germany (Speyer), 1492, paper, I + 273 + I ff. 2° (40,5 × 29 cm), modern binding','Germany (Speyer)','1492','9','','N'),
+('Praha, Královská kanonie premonstrátů na Strahově – Strahovská knihovna, DP VI 20','DP VI 20','Switzerland (Basel), 1495, paper, 294 ff. 2° (31 × 21,5 cm), illuminated, medieval binding','Switzerland (Basel)','1495','9','','')

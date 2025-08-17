@@ -9,11 +9,24 @@ class ctrl_bibliography
             $table= mod_bibliography::get_by_orders(false);
             self::include_template($table);
 	}
+        /** #[route(/api/bibliography/orders) */
+	public static function orders_api()
+	{
+            $table= mod_bibliography::get_by_orders(false);
+            echo $table;
+	}
+        
+        /** #[route(/api/bibliography/order/{order}) */
+	public static function order_api()
+	{
+            $table= mod_bibliography::get_order($order);
+            echo $table;
+	}
         
          /** #[route(/bibliography/all) */
         public static function all()
 	{
-            $table= mod_bibliography::get_2(false);
+            $table= mod_bibliography::get_all(false);
             self::include_template($table);
             
 	}

@@ -24,53 +24,54 @@ class ServerConnection
 	
 	constructor()
 	{
-        this.AjaxResponseInfo=null;
-		this.basepath="api/";
+            this.AjaxResponseInfo=null; 
+            this.basepath="";
+            
 	}
 	
 	GET(url,processing_function,async=true)
 	{
 
 		var xhttp=this.#create_xhttp(processing_function);
-		xhttp.open("get",this.basepath+url+"&source="+location.pathname.match(/admin\/([^/]+)/)[1],async);
+		xhttp.open("get",this.basepath+url,async);
 		xhttp.send();
 	}
 	POST(url,data,processing_function,async=true)
 	{
 		var xhttp=this.#create_xhttp(processing_function);
-		xhttp.open("post",this.basepath+url+"?source="+location.pathname.match(/admin\/([^/]+)/)[1],async);
+		xhttp.open("post",this.basepath+url,async);
 		xhttp.send(data);
 	}
 
     //functions
     delete_file=(delete_file,processing_function)=>
     {
-        this.GET("upload.php?delete_file="+delete_file,processing_function);
+        this.GET("delete?file="+delete_file,processing_function);
     }
-	delete_all=(processing_function)=>
-	{
-		this.GET("upload.php?delete_all=true",processing_function);
-	}
-	process=(processing_function)=>
-	{
-		this.GET("upload.php?process=true",processing_function);
-	}
+    delete_all=(processing_function)=>
+    {
+            this.GET("delete",processing_function);
+    }
+    process=(processing_function)=>
+    {
+            this.GET("process",processing_function);
+    }
     upload_file=(data,processing_function)=>
     {
-        this.POST("upload.php",data,processing_function);
+        this.POST("upload",data,processing_function);
     }
-	get_tmp_data=(h1,h2,h3,record,processing_function)=>
-	{
-		this.GET("get_data.php?tmp=true&h1="+h1+"&h2="+h2+"&h3="+h3+"&record="+record,processing_function);
-	}
-	get_data=(h1,h2,h3,record,processing_function)=>
-	{
-		this.GET("get_data.php?h1="+h1+"&h2="+h2+"&h3="+h3+"&record="+record,processing_function,false);
-	}
-	copy_db=(processing_function)=>
-	{
-		this.GET("tmp_to_def.php",processing_function);
-	}
+    get_tmp_data=(h1,h2,h3,record,processing_function)=>
+    {
+            this.GET("get_data.php?tmp=true&h1="+h1+"&h2="+h2+"&h3="+h3+"&record="+record,processing_function);
+    }
+    get_data=(h1,h2,h3,record,processing_function)=>
+    {
+            this.GET("get_data.php?h1="+h1+"&h2="+h2+"&h3="+h3+"&record="+record,processing_function,false);
+    }
+    copy_db=(processing_function)=>
+    {
+            this.GET("tmp_to_def",processing_function);
+    }
 }
 
 var server=new ServerConnection();

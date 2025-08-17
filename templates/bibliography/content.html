@@ -1,16 +1,80 @@
 <div id="bibliography_container"  class="all_container">
-<h2>Bibliography</h2>
+<h2 name="header">Bibliography</h2>
 <div>
     <div>
 
         <a href="bibliography/order">By order</a>
         <a href="bibliography/all">All</a>
     </div>
-
-    <list-box>
+    <div>
+        <bibl-search-box name="search_box"/>
+    </div>
     <?php
         echo $templateContent;
     ?>
-    </list-box>
+    <script type="module">
+         import {List_Box} from "./public/js/Controls/ListBox.js";
+        import * as WebCtrl from "./public/js/Controls/functions.js";
+        import {Detail_Box} from "./public/js/Controls/DetailBox.js";
+        import {Bibliography_Search_Box} from "./public/js/Controls/SearchBox.js";
+        
+        
+        class Bibliography
+        {
+            constructor()
+            {
+                WebCtrl.populatePageObject({root:"bibliography_container",obj:this,flatten:true,debug:true,populateWithShadows:["LIST-BOX"]});
+                if (this.list!=null)
+                {
+                    this.list.getColumn("order").myFilter=function(p1,cell)
+                    {
+                        var tr=cell.parentNode;
+                        var expTr=tr.nextElementSibling;
+                        if (expTr!=null)
+                        {
+                            var list=expTr.firstElementChild.firstElementChild;
+                            if (list!=null && list.nodeName=="LIST-BOX")
+                            {
+                                if (list.rows_visible>0)
+                                    return true;
+                                else
+                                    return false;
+                            }
+                            else 
+                                return false
+                        }
+                        else
+                            return false;
+                    }
+                }
+                this.search_box.search_url="";
+            }
+            search_box__onSearchSent=(e)=>
+            {
+                var hits=0;
+                if (Array.isArray(this.lst_records)==false)
+                    var lists=[this.lst_records];
+                else
+                    var lists=this.lst_records;
+                for (var l of lists)
+                {
+                    var c=l.getColumn("record");
+                    hits+=c.filter(e.detail.query);
+                }
+                if (this.list!=null)
+                {
+                    this.list.getColumn("order").filter(null);
+                    //this.list.expand_all_rows();
+                }
+                this.search_box.spn_hits.innerHTML="Found "+hits+" hits";
+            }
+            search_box__onSearchCanceled=(e)=>
+            {
+                this.search_box__onSearchSent({detail:{query:""}})
+            }
+
+        }
+        var b=new Bibliography();
+    </script>
 </div>
 </div>

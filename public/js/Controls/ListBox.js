@@ -8,15 +8,152 @@
  * - zobrazení souhrnu v patičce
  * 
  */
+import * as WebPage from "./functions.js";
 
-class Header
+
+var slotted_css=`
+<style>
+                :host
+                {
+                    display:block;
+                    width:100%;
+                }
+                list-box table
+                {
+                    width:100%;
+                }
+                list-box 
+                {
+                    display:block;
+                    width:100%;
+                }
+		list-box table tbody tr.lst_expanded_row > td
+		{
+                    padding-left:20px;
+		}
+                list-box highlight
+                {
+                    font-weight:bold;
+                }
+                list-box table tbody td.lst_expand_c
+                {
+                    width:10px;
+                }   
+                list-box table tbody td.lst_expand_c::after
+		{
+			content:"+";
+			cursor:pointer;
+		}
+		list-box table tbody td.lst_expand_c.exp::after
+		{
+			content:"-";
+			cursor:pointer;
+		}
+                list-box table tbody tr td.same-value
+                {
+                    color:lightgray;
+                }
+                
+                list-box th.w100,td.w100 {max-width:100%;}
+                list-box th.w70,td.w70 {max-width:70%;}
+                list-box th.w30,td.w30 {max-width:30%;}
+                list-box th.w15,td.w15  {max-width:15%;}
+                list-box th.w25,td.w25 {max-width:25%;}
+                list-box th.hidden,td.hidden {display:none};
+                
+                list-box table thead tr.sort th 
+                {
+                    cursor:pointer;
+                }
+                list-box table thead tr.sort th.sort::after
+                {
+                    content:'▽';
+                }
+                list-box table thead tr.sort th.sort.sorted1::after
+                {
+                    content:'▼';
+                }
+                list-box table thead tr.sort th.sort.sorted2::after
+                {
+                    content:'▲';
+                }
+                list-box table thead tr.sort th::after
+                </style>
+		`;
+WebPage.WebComponentCssInjector.addGlobalStyle(slotted_css);
+
+
+class ListBox_Header
 {
-	constructor(_listbox,_thead)
+	constructor(_listbox)
 	{
+            //_thead - original thead
 		this.listbox=_listbox;
-		this.thead=_thead;
+		this.thead=null;
+                this.caption_row=null;
+                this.sorting_row=null;
 		this.filter_row=null;
+                this._visible=true;
+                this._sortable=true;
 	}
+        onConnected()
+        {
+            this.thead=this.listbox.thead;
+            this.caption_row=this.thead.children[0];
+            this.visible=this._visible;
+        }
+        add_row(type)
+        {
+            var tr=document.createElement("tr");
+            tr.setAttribute("type",type);
+            tr.innerHTML=this.caption_row.innerHTML;
+            tr.classList.add(type);
+            var i=0;
+            for (let th of tr.children) 
+            {
+                if (!(th.getAttribute("expand_column")=="true"))
+                {
+                    th.setAttribute("name","th_"+type);
+                    th.classList.add(type);
+                }
+                th.innerHTML="";
+                th.dataset["column"]=i;
+               
+                i++;
+            }
+            this.thead.appendChild(tr);
+            WebPage.addToPagePopulation({obj:this,element:tr});
+        }
+        
+        th_sort__onclick=(e)=>
+        {
+            var cindex=e.target.dataset["column"];
+            if (cindex!=undefined)
+                this.listbox.columns[cindex].sort();
+        }
+        
+        set visible(value)
+        {
+            this._visible=value;
+            if (this.caption_row==null)
+                return 0;
+            if (value==false)
+            {
+                this.caption_row.style.display="none";
+                if (this._sortable==true && this.sorting_row==null)
+                {
+                    this.add_row("sort");
+                }
+            }
+            else
+            {
+                this.caption_row.style.display="";
+            }
+        }
+        get visible()
+        {
+            return this._visible;
+        }
 	show_filters()
 	{
 		if (this.filter_row==null)
@@ -39,10 +176,11 @@ class Header
 		else
 			this.thead.filter_row.style.display="";
 	}
+        
 }
-
 class List_Box extends HTMLElement
 {
+        static stylesheet_loaded=false;
 	/*private properties*/
 	#last_clicked_index; 
 	#last_mouse_position;
@@ -133,43 +271,16 @@ class List_Box extends HTMLElement
 		}
 		return {row:TR,row_index:row_index,cell:TD,column_index:column_index};
 	}
-	#compose_header_HTML=()=>
-	{
-		this.thead.innerHTML="";
-		var newTR=document.createElement("tr");
-		for (var i=0;i<this.columns_count;i++)
-		{
-			
-
-			var newTH=document.createElement("th");
-			if (this.#columns[i].expand_column==false)
-			{
-				let capt=this.#columns[i].caption;
-				if (capt==undefined)
-					capt=this.#columns[i].name;
-				if (capt==undefined)
-					capt="";
-				newTH.innerHTML=capt;
-				if (this.#columns[i].visible===false || this.#columns[i].hidden==true)
-					newTH.style.display="none";
-				if (this.#columns[i].width!="")
-					newTH.style.width=this.#columns[i].width;
-			}
-			newTR.appendChild(newTH);
-			
-		}
-		this.thead.appendChild(newTR);
-		this.header=new Header(this,this.thead);
-		this.header.show_filters();
-		
-	}
+	
 	#appropriate_table(args)
 	{
 		/**
 		 * if we get a html table already from the server as child element of the list-box, we don't "reconstruct" it,
 		 * we only adapt it to serve as our "underlying" table
 		 */
-		let table=this.firstElementChild;
+		let table=this.getElementsByTagName("table")[0];
+                
+                //let table=this.children[0];
 		let appropriating=false;
 		let had_tbody=false;
 		if (table==null || table.nodeName!="TABLE")
@@ -202,6 +313,7 @@ class List_Box extends HTMLElement
 			this.thead=document.createElement("thead");
 			this.table.appendChild(this.thead);
 		}
+                this.header.onConnected();
 		
 		let tfoot=this.table.getElementsByTagName("tfoot");
 		if (tfoot.length>0)
@@ -213,7 +325,7 @@ class List_Box extends HTMLElement
 			this.tfoot=document.createElement("tfoot");
 			this.table.appendChild(this.tfoot);
 		}
-		var index=0;
+		this.#row_count=0;
 		if (appropriating==true)
 		{
 			let tr_parent;
@@ -225,36 +337,41 @@ class List_Box extends HTMLElement
 			var prev_tr=null;
 			for (let tr of tr_parent.children)
 			{
-				if (tr.nodeName=="TR")
-				{
-					if (tr.classList.contains("lst_expanded_row")==false)
-					{
-						tr.dataset["index"]=index;
-						index++;
-						if (tr.classList.contains("lst_item")==false)
-							tr.classList.add("lst_item");
-						
-						if (this.collaps_identical_values==true && prev_tr!=null)
-						{
-							for (var j=0;j<tr.children.length;j++)
-							{
-								if (tr.children[j].classList.contains("lst_expand_c")==false)
-									if (prev_tr.children[j]!=undefined && prev_tr.children[j].textContent==tr.children[j].textContent )
-									tr.children[j].style.visibility="hidden";
-							}
-						}
-						
-						prev_tr=tr;
+                            if (tr.nodeName=="TR")
+                            {
+                                if (tr.classList.contains("lst_expanded_row")==false)
+                                {
+                                    tr.dataset["index"]=this.#row_count;
+                                    this.#row_count++;
+                                    if (tr.classList.contains("lst_item")==false)
+                                        tr.classList.add("lst_item");
 
+                                    if (this.collaps_identical_values==true && prev_tr!=null)
+                                    {
+                                        for (var j=0;j<tr.children.length;j++)
+                                        {
+                                            if (tr.children[j].classList.contains("lst_expand_c")==false)
+                                                if (prev_tr.children[j]!=undefined && prev_tr.children[j].textContent==tr.children[j].textContent )
+                                                tr.children[j].style.visibility="hidden";
+                                        }
+                                    }
 
-					}
-					else
-					{
-						tr.dataset["index"]="";
-					}
-				}
-				else
-					tr.remove();
+                                    prev_tr=tr;
+                                    
+
+                                }
+                                else
+                                {
+                                    tr.dataset["index"]="";
+                                    if (this.expand_all)
+                                    {
+                                        tr.style.display="";
+                                        var expCol=tr.previousElementSibling.getElementsByClassName("lst_expand_c")[0].classList.toggle("exp");
+                                    }
+                                }
+                            }
+                            else
+                                tr.remove();
 			}
 		}
 		else
@@ -268,12 +385,45 @@ class List_Box extends HTMLElement
 				ch.remove();
 			}
 		}
+                
+                this.rows_pairs_iterator(this.same_value_markup);
+		
+		
+		this.table.addEventListener("click",this.table_onclick);
+		this.table.addEventListener("mousemove",this.table_onmousemove);
+		this.table.addEventListener("mouseleave",this.table_onmouseleave);
+		this.rows_visible=this.#row_count;
+                
+		this.#last_clicked_index=-1;
+		this.#last_mouse_position=null;
 		
 	}
 	#appropriate_row(tr)
 	{
 
 	}
+        #rows()
+        {
+            var rows=[];
+            for (var i=0;i<this.tbody.children.length;i++)
+            {
+                var row=[];
+                var tr=this.tbody.children[i];
+                var next_tr=this.tbody.children[i+1];
+                if (tr.classList.contains("lst_item"))
+                {
+                    row.push(tr);
+                    if (next_tr!=null && !next_tr.classList.contains("lst_item"))
+                    {
+                        row.push(next_tr);
+                        i++;
+                    }
+                }
+                rows.push(row);
+            }
+            return rows;
+        }
+        
 	constructor()
 	{
 		super();
@@ -283,18 +433,25 @@ class List_Box extends HTMLElement
 		this.#row_count=0;
 		this.#expandable_rows=false;
 		this.header_set=false;
+                this.header=new ListBox_Header(this);
 		this.collaps_identical_values=(this.getAttribute("collapse_identical_values")=="true");
+		this.show_filters=(this.getAttribute("show_filters")=="true");
 		this.selection_mode=3;//0=nelze vybírat;1=lze označit jeden řádek;2=lze označovat víc řádků v bloku  (pomocí SHIFT); 3=lze označovat více řádků jednotlivě (pomocí CTRL, příp. SHIFT+CTRL)
-		
+		this.expand_all=(this.getAttribute("expand_all")=="true");
+                this.rows_visible=0;
 		/**
 		 * internal methods
 		 */
 		this.onRowAdded=null;
 		this.onMouseEntersRow=null;
 		this.onMouseExitsRow=null;
-		this.onMouseExitsColumn=null, 
-		this.onMouseEntersColumn=null,
+		this.onMouseExitsColumn=null;
+		this.onMouseEntersColumn=null;
 
+
+		this.onRowExpanded=null;
+		this.onAfterRowExpanded=null;
+		
 		/**
 		 * internal helper references
 		 */
@@ -302,31 +459,9 @@ class List_Box extends HTMLElement
 		this.thead=null;
 		
 		//read the table already present - if any
-		this.#appropriate_table();
-		this.#compose_header_HTML();
-		
-		
-		this.table.addEventListener("click",this.table_onclick);
-		this.table.addEventListener("mousemove",this.table_onmousemove);
-		this.table.addEventListener("mouseleave",this.table_onmouseleave);
-		
-		this.#last_clicked_index=-1;
-		this.#last_mouse_position=null;
+               
 
-
-		this.innerHTML=`
-		<style>
-		td.lst_expand_c.exp::after
-		{
-			content:"+";
-			cursor:pointer;
-		}
-		tr.lst_expanded_row > td
-		{
-			padding-left:20px;
-		}
-		</style>
-		`;
+		
 		
 	}
 
@@ -336,34 +471,63 @@ class List_Box extends HTMLElement
 	
 	connectedCallback()
 	{
-		this.appendChild(this.table);
+            if (this.shadowDOM===undefined)
+            {
+                this.shadowDOM=this.attachShadow({mode:'open'});
+                this.shadowDOM.innerHTML="<slot></slot>";
+                //this.innerHTML=this.innerHTML;
+
+                this.#appropriate_table();
+            }
+            /*if (List_Box.stylesheet_loaded==false)
+            {
+                var style=document.createElement("style");
+                style.type="text/css";
+                style.innerText=this.css;
+                document.head.appendChild(style);
+                List_Box.stylesheet_loaded=true;
+            }*/
 	}
+        connectedMoveCallback()
+        {
+            //for moving the element in the page (e. g. by sorting)
+        }
+        
 	static get observedAttributes()
 	{
-		return ["sticky_header","collaps_identical_values"];
+		return ["sticky_header","collaps_identical_values","expand_all",
+                    "show_header","hide_header"];
 	}
 	attributeChangedCallback(name, oldValue, newValue)
 	{
-		if (name=="sticky_header")
-		{
-			this.sticky_header = newValue=="true";
-		}
-		if (name=="collaps_identical_values")
-		{
-			this.collaps_identical_values=newValue=="true";
-		}
+            
+            if (name=="sticky_header")
+            {
+                    this.sticky_header = newValue=="true";
+            }
+            else if (name=="collaps_identical_values")
+            {
+                    this.collaps_identical_values=newValue=="true";
+            }
+            else if (name=="expand_all")
+            {
+                this.expand_all=newValue=="true";
+            }
+            else if (name=="show_header")
+            {
+                this.header.visible=true;
+            }
+            else if (name=="hide_header")
+            {
+                this.header.visible=false;
+            }
+                
 	}
 
 	/**
 	 *  getters and setters:
 	 */
-	set header_visible(value)
-	{
-		if (value==true)
-			this.thead.style.display="";
-		else
-			this.thead.style.display="none";
-	}
+	
 	set sticky_header(value)
 	{
 		if (value==true)
@@ -408,6 +572,8 @@ class List_Box extends HTMLElement
 				{
 					c[p.name]=args[i].getAttribute(p.name);
 				}
+                                if (c["caption"]===undefined)
+                                    c["caption"]=args[i].textContent;
 			}
 			else
 				var c=args[i];
@@ -427,11 +593,27 @@ class List_Box extends HTMLElement
 				filter_enabled:true,
 				onCellAdded: null, //event to triger, when new cell is added to this column (ie new row)
 				onclick:null, //event to triger on click in any cell of this column
-				onFilter:null,
+				myFilter:null,
 				th:null,
 				tbody:this.tbody,
 				width:"",
 				index:i,
+                                list_obj:this,
+                                sorted:0,//0=not sorted, 1=ascending,2=descending
+                                sortingColumn:null,
+                                sortingFunction:function(a,b)
+                                {
+                                    if ((typeof a.value=="string" || typeof b.value=="string")|| sortColumn.datatype=="string")
+                                    {
+                                        return String(a.value).localeCompare(String(b.value),"cs",{sensitivity:"accent"});
+                                    }
+                                    else if ((typeof a.value=="number" && typeof b.value=="number") || sortColumn.datatype=="number")
+                                    {
+                                        a=Number(a);
+                                        b=Number(b);
+                                        return a-b;
+                                    }
+                                },
 				
 				auto:c.auto!=undefined ? c.auto : false,//má se přidat automaticky ke všem sloupcům, aniž by byl explicitně uveden při addRow? (např. sloupec pro rozbalovací ikonku)
 				auto_cell_text:c.auto_cell_text!=undefined ? c.auto_cell_text : null,
@@ -462,50 +644,152 @@ class List_Box extends HTMLElement
 				get cells()
 				{
 					var c=[];
-					var rows=this.tbody.getElementsByTagName("tr");
+					var rows=this.tbody.children;
 					for (var r of rows)
 					{
-						let tds=r.getElementsByTagName("td");
+                                            if (r.classList.contains("lst_expanded_row")==false)
+                                            {
+						let tds=r.children;
 						c.push(tds[this.index]);
+                                            }
 					}
 					return c;
 				},
 
 				filter:function(e) 
 				{
-					
-					var filter_value=e.target.value;
-					var default_filter=function(search,text)
-					{
-						let re=new RegExp(search);
-						if (re.test(text))
-							return true;
-						else
-							return false;
-					};
-					var myCells=this.cells;
-					
-					for (c of myCells)
-					{
-						var r=false;
-						if (filter_value!="")
-						{
-							if (this.onFilter==null)
-								r=default_filter(filter_value,c.textContent);
-							else
-								r=this.onFilter(filter_value,c.textContent);
-						}
-						else
-							r=true;
+                                    var rows_visible=0;
+                                    var filter_value;
+                                    if (typeof e=="string")    
+                                        filter_value=e;
+                                    else if (e!=null)
+                                        filter_value=e.target.value;
 
-						if (r==true)
-							c.parentNode.style.display="";
-						else
-							c.parentNode.style.display="none";
-					}
-					var i=0;
-					
-				}
+                                    var default_filter=function(search,text)
+                                    {
+                                            let re=new RegExp(search);
+                                            if (re.test(text))
+                                                    return true;
+                                            else
+                                                    return false;
+                                    };
+                                    var myCells=this.cells;
+
+                                    for (c of myCells)
+                                    {
+                                        var exp_row=c.parentNode.nextElementSibling;
+                                        if (exp_row!=null && exp_row.classList.contains("lst_expanded_row")==false)
+                                            exp_row=null;
+                                        var r=false;
+                                        if (filter_value!=="")
+                                        {
+                                            if (this.myFilter==null)
+                                                r=default_filter(filter_value,c.textContent);
+                                            else
+                                                r=this.myFilter(filter_value,c);
+                                        }
+                                        else
+                                            r=true;
+
+                                        if (r==true)
+                                        {
+                                            c.parentNode.style.display="";
+                                            if (exp_row!=null)
+                                                exp_row.style.display="";
+                                            rows_visible++;
+                                            this.highlight_cell(c,filter_value);
+                                        }
+                                        else
+                                        {
+                                            c.parentNode.style.display="none";
+                                            if (exp_row!=null)
+                                                exp_row.style.display="none";
+                                        }
+                                    }
+                                    var i=0;
+                                    this.list_obj.rows_visible=rows_visible;
+                                    return rows_visible;
+				},
+                                highlight(phrase)
+                                {
+                                    var cells=this.cells;
+                                    for (c of cells)
+                                    {
+                                        this.highlight_cell(c,phrase);
+                                    }
+                                },
+                                highlight_cell:function(cell,phrase)
+                                {
+                                    if (phrase==null)
+                                        return false;
+                                    /*cell.innerHTML=cell.innerHTML.replaceAll(phrase,"<highlight>"+phrase+"</highlight>");*/
+                                    var rg=new RegExp(phrase,"gi");
+                                    var matchIt=cell.textContent.toLowerCase().matchAll(rg);
+                                    var matches=[];
+                                    WebPage.myRange.unwrap(cell,"highlight");
+                                    if (phrase!="")
+                                    {
+                                        for (let match of matchIt)
+                                        {
+                                            new WebPage.myRange(cell,match.index,match.index+match[0].length).wrap("highlight");
+
+                                        }
+                                    }
+                                    
+                                },
+                                sort:function(direction=null)
+                                {
+                                    if (direction==null)
+                                    {
+                                        this.sorted++;
+                                        if (this.sorted==3)
+                                            this.sorted=1;
+                                    }
+                                    else if (1>=direction && 2<=direction)
+                                        this.sorted=direction;
+                                    else
+                                        return false;
+                                    
+                                    if (this.sortingColumn==null)
+                                        this.sortingColumn=this;
+                                    
+                                    var cells=this.sortingColumn.cells;
+                                    
+                                    var i=0;
+                                    var cells2=cells.map(c=>
+                                    {
+                                       return {value:c.textContent,index:i++};
+                                    });
+                                    
+                                    if (this.sorted==1)
+                                        cells2.sort(this.sortingFunction).reverse();
+                                    else
+                                        cells2.sort(this.sortingFunction);
+                                    var table_rows=this.list_obj.#rows();
+                                    
+
+                                    for (let c of cells2)
+                                    {
+                                        for (let r of table_rows[c.index])
+                                            if (this.tbody.moveBefore==undefined)
+                                                this.tbody.append(r);
+                                            else
+                                                this.tbody.moveBefore(r,null);
+                                    }
+                                    this.list_obj.rows_pairs_iterator(this.list_obj.same_value_markup);
+                                    var sort_row=this.list_obj.thead.getElementsByClassName("sort")[0];
+                                    for (let i=0;i<sort_row.children.length;i++)
+                                    {
+                                        let th=sort_row.children[i];
+                                        th.classList.remove("sorted1");
+                                        th.classList.remove("sorted2");
+                                        if (i==this.index)
+                                        {
+                                            th.classList.add("sorted"+this.sorted);
+                                        }
+                                            
+                                    }
+                                }
 				
 			};
 
@@ -534,6 +818,22 @@ class List_Box extends HTMLElement
 	{
 		return this.#columns;
 	}
+        getColumn(id)
+        {
+            for (var c of this.#columns)
+            {
+                if (typeof id=="string")
+                {
+                    if (c.name==id)
+                        return c;
+                }
+                else if (typeof id=="number")
+                {
+                    if (c.index==id)
+                        return c;
+                }
+            }
+        }
 
 
 	
@@ -547,7 +847,7 @@ class List_Box extends HTMLElement
 	 * 
 	 * actual selecting happens in table onclick 
 	 */
-
+        
 	get selection()
 	{
 		let def_value=-1;
@@ -587,6 +887,11 @@ class List_Box extends HTMLElement
 		 	to manually set selected rows, method add_to_selection can be used
 		 */
 	}
+        value(row_index,column_index=-1)
+        {
+            if (column_index!=-1)
+                return this.cellInterior(row_index,column_index).textContent;
+        }
 
 	cellInterior(row_index, column_index)
 	{
@@ -594,19 +899,18 @@ class List_Box extends HTMLElement
 		{
 			if (column_index>=0 && column_index<this.#columns_count)
 			{
-				var rows=this.tbody.getElementsByClassName("lst_item");
-				for (var i=row_index;i<rows.length;i++)
+				var rows=this.tbody.children;
+				for (var row of rows)
 				{
-					var row=rows[i];
-					if (row.dataset["index"]==row_index)
-					{
-						var cells=row.getElementsByTagName("td")
-						var cell=cells[column_index];
-						if (cell.children[0]!=null && cell.children[0].nodeName.toLowerCase()=="div")
-							return cell.children[0];
-						else
-							return cell;
-					}
+                                    if (row.dataset["index"]==row_index)
+                                    {
+                                            var cells=row.getElementsByTagName("td")
+                                            var cell=cells[column_index];
+                                            if (cell.children[0]!=null && cell.children[0].nodeName.toLowerCase()=="div")
+                                                    return cell.children[0];
+                                            else
+                                                    return cell;
+                                    }
 				}
 			}
 		}
@@ -618,11 +922,26 @@ class List_Box extends HTMLElement
 		var rows=xml.children[0].children;
 		this.add_rows(rows);
 	}
+        load_table=(htmlTable)=>
+        {
+            if (this.table!=null)
+            {
+                this.table.remove();
+                if (typeof htmlTable==="string")
+                {
+                    var tmpDiv=document.createElement("div");
+                    tmpDiv.innerHTML=htmlTable;
+                    this.table=tmpDiv.firstElementChild;
+                    this.appendChild(this.table);
+                    this.#appropriate_table();
+                }
+            }
+        }
 
 	add_rows=(rows)=>
 	{
-		for (let r of rows)
-			this.add_row(r);
+            for (let r of rows)
+                    this.add_row(r);
 	}
 
 	add_row=(items,newTR=null)=>
@@ -789,10 +1108,11 @@ class List_Box extends HTMLElement
 			return false;
 		if (e.target.tagName!="A")
 			e.preventDefault();
+		e.stopPropagation();
 		
 		if (s.cell.classList.contains("lst_expand_c"))
 		{//expand column clicked
-			this.expand_row(s.row);
+			this.expand_row(s.row,true,s);
 		}
 		
 		/**
@@ -834,9 +1154,6 @@ class List_Box extends HTMLElement
 			column_function_triggered=true;
 		}
 		
-		
-		
-		
 		var ce=new CustomEvent("click",{composed:true,detail:{list:this,column_function_triggered:column_function_triggered,...s}});
 		this.dispatchEvent(ce);
 		
@@ -872,32 +1189,57 @@ class List_Box extends HTMLElement
 	{
 	}
 
-	get_expand_data(row)
+	async get_expand_data(s,row)
 	{
 		let url=this.#columns[0].exp_url;
+		let actual_url=url;
 		if (url!="")
 		{
-			let variables=url.match(/\{\$(.*?)\}/g);
-			let v=null;
-			while (v=variables.next())
-			{
-				let vname=v[1];
-				let vvalue="";
-				for (var i=0;i<this.#columns.length;i++)
-				{
-					if (this.#columns[i].name==vname)
-					{
-						let td=row.getElementsByTagName("td");
-						vvalue=td[i].textContent;
-					}
+                    let variables=url.matchAll(/\{\$?(.*?)\}/g);
+                    let v=null;
+                    if (variables!=null)
+                    {
+                        v=variables.next();
+                        while (v.done!=true)
+                        {
+                            let vname=v.value[1];
+                            let vvalue="";
+                            for (var i=0;i<this.#columns.length;i++)
+                            {
+                                if (this.#columns[i].name==vname)
+                                {
+                                    let td=s.row.getElementsByTagName("td");
+                                    vvalue=encodeURIComponent(td[i].textContent);
+                                }
 
-				}
-				//let actual_url=url.replace();
+                            }
+                            actual_url=url.replace(v.value[0],vvalue);
+                            v=variables.next();
+                        }
+                    }
+			var response=await fetch(actual_url);
+			var responseXML=await response.responseXML;
+			response.text().then((text)=>
+			{
+				row.firstElementChild.innerHTML=text;
+
+				var ce=new CustomEvent("AfterRowExpanded",{composed:true,detail:
+					{parentList:this,newList:row.firstElementChild.firstElementChild,...s}});
+				this.dispatchEvent(ce);
 			}
+		);
+			
 		}
+
 	}
-	
-	expand_row(row, hide_if_expanded=true)
+	expand_all_rows()
+        {
+            for (var r of this.tbody.children)
+            {
+                this.expand_row(r);
+            }
+        }
+	expand_row(row, hide_if_expanded=true,s)
 	{
 		/**
 		 * click on expand button: if expanded row already exists, we show/hide it.
@@ -905,8 +1247,11 @@ class List_Box extends HTMLElement
 		 */
 		if (typeof(row)==="object" && row.classList!=undefined && row.classList.contains("lst_item"))
 		{
-			var row_to_expand=row;
+                    var row_to_expand=row;
+                    row_to_expand.getElementsByClassName("lst_expand_c")[0].classList.toggle("exp");
 		}
+                else
+                    return false;
 		if (row_to_expand.nextElementSibling==null || row_to_expand.nextElementSibling.classList.contains("lst_expanded_row")==false)
 		{
 			var TR=document.createElement("tr");
@@ -915,11 +1260,16 @@ class List_Box extends HTMLElement
 			TR.classList.add("lst_expanded_row");
 			TR.appendChild(TD);
 			this.tbody.insertBefore(TR,row_to_expand.nextElementSibling);
-			this.get_expand_data(TR);
+			this.get_expand_data(s,TR);
+
+			var ce=new CustomEvent("RowExpanded",{composed:true,detail:
+				{list:this,expanded_row:TR,...s}});
+			this.dispatchEvent(ce);
+                        
 			return TD;
 		}
 		else if (row_to_expand.nextElementSibling.classList.contains("lst_expanded_row")==true)
-		{
+		{//expand table already exists: we hide it if visible, show if hidden
 			if (row.nextElementSibling.style.display=="none")
 				row_to_expand.nextElementSibling.style.display="";
 			else if (hide_if_expanded==true)
@@ -948,9 +1298,50 @@ class List_Box extends HTMLElement
 	get data()
 	{
 	}
+        
+        rows_pairs_iterator(fn,include_expanded=false)
+        {
+            var row_count=this.tbody.children.length;
+            for (var i=0;i< row_count-1;i++)
+            {
+                var r1=this.tbody.children[i];
+                if (include_expanded==false && r1.classList.contains("lst_expanded_row")==true)
+                    continue;
+                var r2=this.tbody.children[i+1];
+                if (include_expanded==false && r2.classList.contains("lst_expanded_row")==true)
+                {
+                   r2=this.tbody.children[i+2];
+                }                    
+                if (r1!=null && r2!=null)
+                    fn(r1,r2,i==0);
+            }
+        }
+        
+        same_value_markup(r1,r2,first)
+        {
+            //marks cells with the same value as the cell one row above in the same column has
+            for (var i=0;i<r2.children.length;i++)
+            {
+                var td2=r2.children[i];
+                if (i==0 && td2.classList.contains("lst_expand_c"))
+                    continue;//the expand columns are not of concern
+                var td1=r1.children[i];
+                if (td1.textContent==td2.textContent)
+                    td2.classList.add("same-value");
+                else
+                    td2.classList.remove("same-value");
+                if (first==true)
+                    td1.classList.remove("same-value");
+            }
+        }
 }
 
+
 customElements.define("list-box",List_Box);
+
+
+
+
 
 export {List_Box};
   

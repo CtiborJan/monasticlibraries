@@ -3,7 +3,7 @@
 		SKUPINA:
 							Soupis středověkých rukopisů z knihovny řeholních kanovníků sv. Augustina v Borovanech
 				SIGNATURA:
-					
+					sine sig.
 				POPIS:
 					
 			RUKOPIS:
@@ -11,13 +11,13 @@
 				SIGNATURA:
 					 I A 29a
 				POPIS:
-					Čechy, XV in. (část datována 1412) + XIV ex., pap., II + 419 (recte 439) + I ff. 30 × 22 cm, vazba dobová
+					Čechy, XV in. (část 1412) + XIV ex., pap., II + 419 (recte 439) + I ff. 30 × 22 cm, vazba dobová
 				URL:
 					https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__I_A_29A_____0P5W1R6-cs
 					ZÁZNAM:
-						1va–380ra: [Biblia, Vetus testamentum partim cum prologis, pars]
+						1va–380ra: [Biblia, Vetus testamentum, pars (Genesis – Psalmi)]
 					ZÁZNAM:
-						381ra–419va: [Pseudo-Stephanus Langton: Interpretatio vocabulorum Hebraicorum]
+						381ra–419va: [Pseudo-Stephanus Langton: Interpretationes nominum Hebraicorum]
 			RUKOPIS:
 								Praha, Národní knihovna České republiky, I A 29b
 				SIGNATURA:
@@ -29,7 +29,7 @@
 					ZÁZNAM:
 						1v–7r: [Registrum pericoparum per circulum anni]
 					ZÁZNAM:
-						8r–263v: [Biblia, Novum testamentum, partim cum prologis]
+						8r–263v: [Biblia, Novum testamentum]
 			RUKOPIS:
 								Praha, Národní knihovna České republiky, I A 32
 				SIGNATURA:
@@ -73,7 +73,7 @@
 					ZÁZNAM:
 						87va–90ra: [Pseudo-Hieronymus Stridonensis: Epistola supp. 42 ad Oceanum]
 					ZÁZNAM:
-						90ra–95va: [Hieronymus Stridonensis: Epistola 148 ad Celantiam matronam, excerptum (par. 5–22)]
+						90ra–95va: [Hieronymus Stridonensis: Epistola 148 ad Celantiam matronam (excerptum)]
 					ZÁZNAM:
 						95va–99rb: [Pseudo-Augustinus: Sermo app. 117 (in natali domini)]
 					ZÁZNAM:
@@ -183,7 +183,7 @@
 					ZÁZNAM:
 						194vb: „Thema“ [de corpore Christi]
 					ZÁZNAM:
-						195ra–195vb: [Conradus Waldhauser: Sermo de corpore Christi, pars]
+						195ra–195vb: [Conradus de Waldhausen (Waldhauser): Sermo de corpore Christi, pars]
 			RUKOPIS:
 								
 									{nejisté umístění}
@@ -195,9 +195,9 @@
 				URL:
 					https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__I_D_11______1ESMK9C-cs
 					ZÁZNAM:
-						1ra–135va, 145 ter ra–286rb, 287ra–292ra: [Conradus Waldhauser: Postilla studentium sanctae Pragensis universitatis]
+						1ra–135va, 145 ter ra–286rb, 287ra–292ra: [Conradus de Waldhausen (Waldhauser): Postilla studentium sanctae Pragensis universitatis]
 					ZÁZNAM:
-						135vb–144rb: [Conradus Waldhauser (partim): Postilla studentium sanctae Pragensis universitatis, additamenta]
+						135vb–144rb: [Conradus de Waldhausen (Waldhauser) (partim): Postilla studentium sanctae Pragensis universitatis, additamenta]
 					ZÁZNAM:
 						292va–294rb: [Tractatus de praeparatione ad mortem]
 			RUKOPIS:
@@ -225,7 +225,7 @@
 					ZÁZNAM:
 						1ra–120va: [Thomasco (crucifer) de Strakonicz: Sermones dominicales]
 					ZÁZNAM:
-						120va: „Nota 7 dubitabiliora circa corpus Christi vel questiones“
+						120va: „Nota 7 dubitabiliora circa corpus Cristi vel questiones“
 					ZÁZNAM:
 						121ra–142rb: [Robertus Holcot?: Moralitates, liber I]
 					ZÁZNAM:
@@ -261,9 +261,9 @@
 				URL:
 					https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__I_D_18______0PACVN8-cs
 					ZÁZNAM:
-						1r–261v: [Biblia, Novum testamentum cum prologis]
+						1r–261v: [Biblia, Novum testamentum]
 					ZÁZNAM:
-						45v–228r: [Expositiones pericoparum sive adumbrationes sermonum, in marginibus bibliae scriptae]
+						45v–228r: [Expositiones pericoparum sive adumbrationes sermonum, in marginibus Bibliae scriptae]
 					ZÁZNAM:
 						261v–267r: [Versus de quattuor evangeliis (Materia capitulorum quattuor evangeliorum)]
 					ZÁZNAM:
@@ -271,7 +271,7 @@
 					ZÁZNAM:
 						267r: [De canonibus evangeliorum]
 					ZÁZNAM:
-						267r: [Numerus capitulorum singulorum librorum bibliae]
+						267r: [Numerus capitulorum singulorum librorum Bibliae]
 					ZÁZNAM:
 						267v: „Incipit prephacio in omnes epistolas sancti Pauli“
 					ZÁZNAM:
@@ -283,23 +283,23 @@
 					ZÁZNAM:
 						268r: [Prologus in evangelia]
 					ZÁZNAM:
-						268r–268v: [Excerpta, praecipue expositorum bibliae]
+						268r–268v: [Excerpta, praecipue expositorum Bibliae]
 					ZÁZNAM:
-						268vb–268va: „Metra capitulorum et librorum biblie quot sunt“
+						268vb–268va: „Metra capitulorum et librorum Biblie quot sunt“
 					ZÁZNAM:
-						268va: [Versus de ordine librorum bibliae]
+						268va: [Versus de ordine librorum Bibliae]
 					ZÁZNAM:
 						268va: [Numerus capitulorum librorum prophetarum]
 					ZÁZNAM:
 						268vb: „De sciencia versus“
 					ZÁZNAM:
-						268vb: „Isti versus utiles sunt ad retinendum memoriter nomina et ordinem biblie“
+						268vb: „Isti versus utiles sunt ad retinendum memoriter nomina et ordinem Biblie“
 					ZÁZNAM:
 						268vb: [De numero epistolarum canonicarum]
 					ZÁZNAM:
 						268vc: „Epistole Pauli XIIII“
 					ZÁZNAM:
-						268vc: „Capitula in biblia tota“
+						268vc: „Capitula in Biblia tota“
 					ZÁZNAM:
 						268vc: [De lege divina]
 			RUKOPIS:
@@ -319,9 +319,9 @@
 				URL:
 					https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__I_D_44______1LLAUT6-cs
 					ZÁZNAM:
-						1ra–183va: [Iohlinus Vodnianensis: Postilla Zderaziensis, pars tertia (aestivalis), a Pascha usque ad adventum domini]
+						1ra–183va: [Iohlinus Vodnianensis: Postilla Zderaziensis, pars 3 (aestivalis)]
 					ZÁZNAM:
-						183vb–201vb: [Iohlinus Vodnianensis: Themata sermonum a Pascha usque ad adventum domini]
+						183vb–201vb: [Iohlinus Vodnianensis: Themata sermonum]
 			RUKOPIS:
 								Praha, Národní knihovna České republiky, I E 14
 				SIGNATURA:
@@ -337,7 +337,7 @@
 					ZÁZNAM:
 						43ra–125ra: [Antonius Azaro de Parma: Sermones quadragesimales]
 					ZÁZNAM:
-						125rb–126ra: „Quomodo Christus captus fuit“
+						125rb–126ra: „Quomodo Cristus captus fuit“
 					ZÁZNAM:
 						126v: [Tabula computistica]
 					ZÁZNAM:
@@ -361,7 +361,7 @@
 					ZÁZNAM:
 						249va–252rb: [Distinctio Decreti Gratiani]
 					ZÁZNAM:
-						257v: [Excerpta ex Decreto Gratiani]
+						257v: [Excerpta e Decreto Gratiani]
 			RUKOPIS:
 								Praha, Národní knihovna České republiky, I E 47
 				SIGNATURA:
@@ -375,7 +375,7 @@
 					ZÁZNAM:
 						1r–13v: [Simon de Tissnow: Epistola publica contra quattuor articulos Bohemorum membris concilii Czaslaviensis missa]
 					ZÁZNAM:
-						13v–22v: [Stephanus de Palecz: Replicatio contra quiddamistas, incompleta]
+						13v–22v: [Stephanus de Palecz: Replicatio contra quiddamistas (incompleta)]
 					ZÁZNAM:
 						22v: „Auctoritates de excommunicacione et vinculis prelatorum“
 					ZÁZNAM:
@@ -431,7 +431,7 @@
 				SIGNATURA:
 					 I F 13
 				POPIS:
-					Čechy, XIV ex. (část datována 1389), pap., 194 (recte 193) ff. 22,5 × 15 cm, vazba mladší
+					Čechy, XIV ex. (část 1389), pap., 194 (recte 193) ff. 22,5 × 15 cm, vazba mladší
 				URL:
 					https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__I_F_13______0DBX5VB-cs
 					ZÁZNAM:
@@ -443,7 +443,7 @@
 					ZÁZNAM:
 						26v: [Pictura arboris vitae]
 					ZÁZNAM:
-						27r–27v: „Oracio ad Christum et matrem eius in ligno vite positis“
+						27r–27v: „Oracio ad Cristum et matrem eius in ligno vite positis“
 					ZÁZNAM:
 						28r–38r: [Bonaventura: Lignum vitae (Tractatus de arbore crucis)]
 					ZÁZNAM:
@@ -535,7 +535,7 @@
 					ZÁZNAM:
 						99r–107r, 114r–114v, 122r–126v: [Tabulae astronomicae et computisticae cum expositione]
 					ZÁZNAM:
-						107v: [Pseudo-Bonaventura: Tabula ante celebrationem missae consideranda] („Que debent fieri in missa“)
+						107v: „Que debent fieri in missa“ [Pseudo-Bonaventura: Tabula ante celebrationem missae consideranda]
 					ZÁZNAM:
 						107v: [Versus de missa]
 					ZÁZNAM:
@@ -551,7 +551,7 @@
 				POPIS:
 					Čechy, XV med. + XV
 				\sup:11\sup:0
-			 (část datována 1432), pap., I + 283 (recte 301) + I ff. 22 × 15 cm, vazba dobová
+			 (část 1432), pap., I + 283 (recte 301) + I ff. 22 × 15 cm, vazba dobová
 				URL:
 					https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__I_G_12______3SNAHO8-cs
 					ZÁZNAM:
@@ -589,7 +589,7 @@
 				POPIS:
 					Čechy?, XV
 				\sup:11\sup:0
-			 (část datována 1437), pap., I + 260 (recte 261) + I ff. 21,5 × 14,5 cm, vazba dobová
+			 (část 1437), pap., I + 260 (recte 261) + I ff. 21,5 × 14,5 cm, vazba dobová
 				URL:
 					https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__I_G_13______30KDZPE-cs
 					ZÁZNAM:
@@ -611,7 +611,7 @@
 					ZÁZNAM:
 						144r–152v: [Fulgentius Ruspensis / Pseudo-Augustinus: De fide ad Petrum, capp. 4–44]
 					ZÁZNAM:
-						152v–155r: [Petrus de Pennis: Tractatus contra Iudaeos, excerpta?]
+						152v–155r: [Petrus de Pennis: Tractatus contra Iudaeos (excerpta?)]
 					ZÁZNAM:
 						156r–164v: [Hermannus de Schildesche: Speculum manuale sacerdotum]
 					ZÁZNAM:
@@ -635,7 +635,7 @@
 					ZÁZNAM:
 						81v–123v: [Aldobrandinus de Toscanella: Tractatus pro defunctis]
 					ZÁZNAM:
-						123v–124r: „De ludo taxillorum“ [Stephanus de Colonia: Libellus de poenitentia, excerptum]
+						123v–124r: „De ludo taxillorum“ [Stephanus de Colonia: Libellus de poenitentia (excerptum)]
 					ZÁZNAM:
 						124r–134v: [Ambrosius Autpertus: De conflictu vitiorum atque virtutum, capp. 1–27]
 					ZÁZNAM:
@@ -649,9 +649,9 @@
 					ZÁZNAM:
 						187v–188r: „Septem criminalia peccata cum suis radicibus seu filiabus“ [versus]
 					ZÁZNAM:
-						188v–189v: [Hugo Ripelin de Argentina: Compendium theologicae veritatis, excerptum de peccatis (liber III, capp. 30–33)]
+						188v–189v: [Hugo Ripelin de Argentina: Compendium theologicae veritatis (excerptum de peccatis – liber III, capp. 30–33)]
 					ZÁZNAM:
-						189v–190r: [Decretum Gratiani, liber I, dist. 27, cap. 3, par. 6–7]
+						189v–190r: [Decretum Gratiani, liber I, dist. 27, cap. 3, pars 6–7]
 					ZÁZNAM:
 						192v: [Textus de conceptione et partu, fragmentum]
 			RUKOPIS:
@@ -663,7 +663,7 @@
 				URL:
 					https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__I_G_35______223QNI9-cs
 					ZÁZNAM:
-						1r–36v: [Guilelmus Duranti: Rationale divinorum officiorum, excerpta ex libro tertio et praecipue quarto de missa]
+						1r–36v: [Guilelmus Duranti: Rationale divinorum officiorum, partes (excerpta ex libro tertio et praecipue quarto de missa)]
 					ZÁZNAM:
 						37r–108v: [Pseudo-Thomas de Aquino / Pseudo-Albertus Magnus: De sacramento eucharistiae sermones]
 					ZÁZNAM:
@@ -689,7 +689,7 @@
 					ZÁZNAM:
 						74v–89r: [Malachias Hibernicus?: Venenum vitiorum]
 					ZÁZNAM:
-						89v: [Excerpta]
+						89v: [Excerpta varia]
 			RUKOPIS:
 								Praha, Národní knihovna České republiky, VI A 21
 				SIGNATURA:
@@ -799,7 +799,7 @@
 				SIGNATURA:
 					 VI D 15
 				POPIS:
-					Německo? / Rakousko?, XV med. (část datována 1453), pap., II + 350 (recte 351) + I ff. 28 × 20,5 cm, vazba soudobá
+					Německo? / Rakousko?, XV med. (část 1453), pap., II + 350 (recte 351) + I ff. 28 × 20,5 cm, vazba soudobá
 				URL:
 					https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__VI_D_15_____42SG934-cs
 					ZÁZNAM:
@@ -901,7 +901,7 @@
 					ZÁZNAM:
 						105r–109v: „De confessione“
 					ZÁZNAM:
-						109v–111v: „De passione“ [= Bonaventura: De perfectione vitae ad sorores, excerptum]
+						109v–111v: „De passione“ [= Bonaventura: De perfectione vitae ad sorores (excerptum)]
 					ZÁZNAM:
 						111v–115r: [Henricus de Bitterfeld: De septem horis canonicis]
 					ZÁZNAM:
@@ -959,9 +959,9 @@
 					ZÁZNAM:
 						47va–47vb: [Notae, praecipue canonico-iuridicae]
 					ZÁZNAM:
-						48ra–61vb: [Decretum Gratiani, excerpta cum glossis marginalibus]
+						48ra–61vb: [Decretum Gratiani (excerpta cum glossis marginalibus)]
 					ZÁZNAM:
-						62ra–142ra: [Conradus Waldhauser: Postilla studentium sanctae Pragensis universitatis]
+						62ra–142ra: [Conradus de Waldhausen (Waldhauser): Postilla studentium sanctae Pragensis universitatis]
 					ZÁZNAM:
 						144va–144vb: [Excerpta theologica, praecipue de remissione peccatorum]
 			RUKOPIS:
@@ -973,7 +973,7 @@
 				\sup:12\sup:0
 			, pap., I + 102 ff. 29,5 × 21 cm, vazba dobová
 					ZÁZNAM:
-						1ra–29vb: [Thomas de Valcellis?: Sermones de sanctis] („Viridarius“)
+						1ra–29vb: „Viridarius“ [Thomas de Valcellis?: Sermones de sanctis]
 					ZÁZNAM:
 						30ra–45vb: [Sermones, praecipue de sanctis]
 					ZÁZNAM:
@@ -999,7 +999,7 @@
 					ZÁZNAM:
 						365va–365vb: [Gn XIV,1–15]
 					ZÁZNAM:
-						365vb–371ra: „Hic notantur septem dubia vel questiuncule de papa et imperatore“ [Augustinus de Ancona: De potestate ecclesiastica, excerptum]
+						365vb–371ra: „Hic notantur septem dubia vel questiuncule de papa et imperatore“ [Augustinus de Ancona: De potestate ecclesiastica (excerptum)]
 					ZÁZNAM:
 						371ra–373rb: [Nicolaus de Dinkelsbühl: Sermo de oblationibus]
 					ZÁZNAM:
@@ -1067,7 +1067,7 @@
 					ZÁZNAM:
 						122r–122v: [Notae, praecipue de oratione, partim versificatae]
 					ZÁZNAM:
-						123r–157r: [Expositiones verborum bibliae, hymnorum, sequentiarum, legendarum]
+						123r–157r: [Expositiones verborum Bibliae, hymnorum, sequentiarum, legendarum]
 					ZÁZNAM:
 						157r–157v: [Notae theologicae]
 					ZÁZNAM:
@@ -1127,7 +1127,7 @@
 				POPIS:
 					Čechy, XIV/XV, pap. + perg., I + 225 (recte 222) + I ff. 22,5 × 15 cm, vazba soudobá
 					ZÁZNAM:
-						1r–225v: [Vitae patrum, incompletae]
+						1r–225v: [Vitae patrum (incompletae)]
 			RUKOPIS:
 								Praha, Národní knihovna České republiky, XIII E 8
 				SIGNATURA:
@@ -1135,7 +1135,7 @@
 				POPIS:
 					Čechy (Český Krumlov), XV
 				\sup:12\sup:0
-			 (části datovány 1457 a 1470), pap., 367 (recte 375) ff. 22 × 15 cm, vazba soudobá
+			 (části 1457 a 1470), pap., 367 (recte 375) ff. 22 × 15 cm, vazba soudobá
 					ZÁZNAM:
 						1r–7r: [Iohannes Andreae: Summa brevissima super IV. libro decretalium de matrimonio]
 					ZÁZNAM:
@@ -1155,7 +1155,7 @@
 					ZÁZNAM:
 						223r–223v: [Arbor consanguinitatis et affinitatis cum notis]
 					ZÁZNAM:
-						224r–319r: [Iacobus de Zocchis de Ferraria: Repetitio capituli Omnis utriusque sexus] („Tractatus solempnis de penitencia et remissione“)
+						224r–319r: „Tractatus solempnis de penitencia et remissione“ [Iacobus de Zocchis de Ferraria: Repetitio capituli Omnis utriusque sexus]
 					ZÁZNAM:
 						320r–347v: [Iacobus de Zocchis de Ferraria: Tractatus de differentiis casuum fori contentiosi et conscientiae]
 					ZÁZNAM:
@@ -1183,7 +1183,7 @@
 					ZÁZNAM:
 						120r–130r: [Medela (Medicina) animae vulneratae]
 					ZÁZNAM:
-						131r–143v: [Fragmentum textus theologici]
+						131r–143v: [Textus theologicus, fragmentum]
 			RUKOPIS:
 								Praha, Národní knihovna České republiky, XIII G 17
 				SIGNATURA:
@@ -1195,7 +1195,7 @@
 					ZÁZNAM:
 						1r–40v: [Haimo Autissiodorensis? / Pseudo-Haimo Halberstatensis: Expositio super Canticum canticorum]
 					ZÁZNAM:
-						41r–47 bis v: [Iohannes de Iessenicz: Auctoritates evangelii, doctorum, canonum et ecclesiae pro communione corporis et sanguinis domini nostri Ihesu Christi fidelibus sub utraque specie panis et vini usque diem iudicii ministranda]
+						41r–47 bis v: [Iohannes de Iessenicz: Auctoritates evangelii, doctorum, canonum et ecclesiae pro communione corporis et sanguinis domini nostri Iesu Christi fidelibus sub utraque specie panis et vini usque diem iudicii ministranda]
 					ZÁZNAM:
 						47 bis v–65v: [Nicolaus de Dinkelsbühl: Tractatus contra errores Hussitarum „Barones regni Bohemie“]
 					ZÁZNAM:
@@ -1267,11 +1267,11 @@
 					ZÁZNAM:
 						43r–45v: [Carmen rhythmicum de educatione puerorum]
 					ZÁZNAM:
-						45v: [De fine mundi] („Consideracio diei iudicii, quando instabit etc.“)
+						45v: „Consideracio diei iudicii, quando instabit etc.“ [De fine mundi]
 					ZÁZNAM:
 						46r–47v: [De lupis]
 					ZÁZNAM:
-						48r–49v: [Archipoeta: Confessio] („Carmina Primatis“)
+						48r–49v: „Carmina Primatis“ [Archipoeta: Confessio]
 					ZÁZNAM:
 						49v: [De castitate]
 					ZÁZNAM:
@@ -1285,15 +1285,15 @@
 					ZÁZNAM:
 						84r–87v: [Prognostica Lunae et planetarum]
 					ZÁZNAM:
-						88r–93v: [Pseudo-Aristoteles: Secretum secretorum, pars secunda, capp. 2–14, translatio Philippi de Tripolis]
+						88r–93v: [Pseudo-Aristoteles: Secretum secretorum, pars 2, capp. 2–14, translatio Philippi de Tripolis]
 					ZÁZNAM:
 						93v–94r: [Recepta varia]
 					ZÁZNAM:
-						94r–95r: [Pseudo-Aristoteles: Secretum secretorum, pars secunda, capp. 15–16, 18–20, translatio Philippi de Tripolis]
+						94r–95r: [Pseudo-Aristoteles: Secretum secretorum, pars 2, capp. 15–16, 18–20, translatio Philippi de Tripolis]
 					ZÁZNAM:
 						95r–95v: [Báseň „Našě sestra Jana“]
 					ZÁZNAM:
-						95v: [Pseudo-Aristoteles: Secretum secretorum, pars quarta, cap. 17, translatio Philippi de Tripolis]
+						95v: [Pseudo-Aristoteles: Secretum secretorum, pars 4, cap. 17, translatio Philippi de Tripolis]
 					ZÁZNAM:
 						96r–96v: [Prognostica urinae]
 			RUKOPIS:
@@ -1357,11 +1357,21 @@
 				\sup:12\sup:0
 			 (cca 1468?), pap., I + 238 ff. 31 × 21 cm, vazba mladší
 					ZÁZNAM:
-						1ra–238vb: [Biblia, Vetus testamentum cum prologis, pars]
+						1ra–238vb: [Biblia, Vetus testamentum, pars (prophetae, Proverbia – Ecclesiasticus, libri Machabaeorum)]
+			RUKOPIS:
+								
+									{nejisté umístění}
+								Vyšší Brod, cisterciácký klášter, č. 77
+				SIGNATURA:
+					 č. 77
+				POPIS:
+					Čechy, XIV, pap., I + 151 ff. 29,5 × 21,5 cm, ilum., vazba mladší
+					ZÁZNAM:
+						1r–151v: [Biblia, Novum testamentum]
 		SKUPINA:
 							Soupis středověkých rukopisných zlomků z knihovny řeholních kanovníků sv. Augustina v Borovanech
 				SIGNATURA:
-					
+					sine sig.
 				POPIS:
 					
 			RUKOPIS:

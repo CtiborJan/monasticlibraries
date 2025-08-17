@@ -1,0 +1,10 @@
+insert into tmp_rukopisy (nazev,signatura,popis,misto_vzniku,obdobi,skupina,url,pozn) values 
+('Bamberg, Staatsbibliothek, Inc.typ.B.II.9','Inc.typ.B.II.9','Německo (Augsburg), 1477 + před 1478 + cca 1477 + cca 1475–1477, pap., 51 + 42 + 62 + 45 ff. 2° (28 × 20,5 cm), vazba soudobá','Německo (Augsburg)','1477 + před 1478 + cca 1477 + cca 1475–1477','14','',''),
+('Bamberg, Staatsbibliothek, Inc.typ.M.III.14','Inc.typ.M.III.14','Německo (Norimberk), cca 1473–1474, pap., 90 + 12 ff. 2° (28,5 × 21 cm), ilum., vazba soudobá','Německo (Norimberk)','cca 1473–1474','14','',''),
+('Bamberg, Staatsbibliothek, Inc.typ.P.III.3','Inc.typ.P.III.3','Itálie (Benátky), 1479, pap., 190 ff. 2° (43 × 28,5 cm), vazba soudobá','Itálie (Benátky)','1479','14','',''),
+('Bamberg, Staatsbibliothek, Inc.typ.Q.I.39','Inc.typ.Q.I.39','Německo (Norimberk) + Francie (Štrasburk), 1473 + cca 1475, pap., 97 + 8 + 167 ff. 2° (28 × 20 cm), vazba soudobá','Německo (Norimberk) + Francie (Štrasburk)','1473 + cca 1475','14','',''),
+('Bamberg, Staatsbibliothek, Inc.typ.Q.I.43','Inc.typ.Q.I.43','Německo (Norimberk), 1474, pap., 438 ff. 2° (36 × 27,5 cm), ilum., vazba mladší','Německo (Norimberk)','1474','14','',''),
+('Bamberg, Staatsbibliothek, Inc.typ.Q.I.44','Inc.typ.Q.I.44','Německo (Norimberk), 1474, pap., 421 ff. 2° (38 × 27,5 cm), ilum., vazba mladší','Německo (Norimberk)','1474','14','',''),
+('Bamberg, Staatsbibliothek, Inc.typ.Q.IV.31','Inc.typ.Q.IV.31','Itálie (Benátky), 1481, pap., 116 ff. 4° (22,5 × 16,5 cm), vazba soudobá','Itálie (Benátky)','1481','14','',''),
+('Bamberg, Staatsbibliothek, Inc.typ.Q.VI.5','Inc.typ.Q.VI.5','Německo (Špýr, Memmingen, Augsburg, Kolín, Pasov), 1486 + cca 1485 + po 1486 + 1489 + 1475 + cca 1487 + cca 1487–1488, pap., 49 + 12 + 8 + 44 + 98 + 16 + 41 + 44 ff. 4° (20 × 14 cm), vazba soudobá','Německo (Špýr, Memmingen, Augsburg, Kolín, Pasov)','1486 + cca 1485 + po 1486 + 1489 + 1475 + cca 1487 + cca 1487–1488','14','',''),
+('Inkunábule s neznámým místem uložení','(sine sig.{2})','Německo (Norimberk), 1481, pap., 326 ff. 2° (32 × 21 cm), ilum., vazba soudobá','Německo (Norimberk)','1481','14','','')

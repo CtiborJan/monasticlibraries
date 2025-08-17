@@ -1,17 +1,118 @@
 <div id="manuscripts_container"  class="all_container">
-<h2>Bibliography</h2>
+<h2>Manuscripts</h2>
 <div>
     <div>
         <a href="manuscripts/collections">By collection</a>
-        <a href="manuscripts/place">By place of origin</a>
-        <a href="manuscripts/all_manuscripts">All manuscripts</a>
+        <a href="manuscripts/all">All manuscripts</a>
+    </div>
+    <div>
+        <search-box name="search_box"></search-box>
     </div>
 
-    <list-box>
-    <?php
-        echo $templateContent;
-    ?>
-    </list-box>
+    <mns-wrapper>
+        <div name="list_container">
+        <?php
+            echo $templateContent;
+        ?>
+        </div>
+    </mns-wrapper>
+
+    <script type="module">
+        import * as WebCtrl from "./public/js/Controls/functions.js";
+        import {Mns_Wrapper} from "./public/js/Controls/MnsWrapper.js";    
+        import {List_Box} from "./public/js/Controls/ListBox.js";
+        import {Detail_Box} from "./public/js/Controls/DetailBox.js";
+        import {Search_Box} from "./public/js/Controls/SearchBox.js";
+        
+        
+        class Manuscripts
+        {
+            #value="";
+            constructor()
+            {
+                WebCtrl.populatePageObject({root:"manuscripts_container",obj:this,flatten:true,populateWithShadows:["LIST-BOX"]});
+                //this.detail_box=document.createElement("detail-box");
+                //document.body.appendChild(this.detail_box);
+                
+                if (location.href.split("/").pop()=="all")
+                    this.search_box.outputType="m";
+                else if (location.href.split("/").pop()=="places")
+                    this.search_box.outputType="o";
+                else
+                    this.search_box.outputType="c";
+                
+            }
+            
+            list__onAfterRowExpanded=(e)=>
+            {
+                var newList=e.detail.newList;
+                WebCtrl.addToPagePopulation({obj:this,element:newList});
+                if (newList.getAttribute("name")=="lst_mnsGroup")
+                {
+                    newList.getColumn("title").sortingColumn=newList.getColumn("period");
+                }
+            }
+            lst_mnsGroup__onclick=(e)=>
+            {
+                var c_index=e.detail.column_index;
+                var r_index=e.detail.row_index;
+                if (c_index!=0)   
+                {
+                    var signature=e.detail.list.value(r_index,2);
+                    this.load_manuscript_detail(signature);
+                }
+            }
+            load_manuscript_detail= async (signature)=>
+            {
+                var response=await fetch("api/manuscripts/"+signature+"/detail");
+                var text =await response.text()
+                WebCtrl.appendAndAdd({element:text,obj:this});
+                
+                return false;
+                
+                var parser=document.createElement("div");
+                parser.innerHTML=text;
+                document.body.appendChild(parser.firstElementChild);
+                
+                WebCtrl.addToPagePopulation({obj:this,element:parser.firstElementChild});
+                
+            }
+            
+            search_box__onSearchResultsReceived=(e)=>
+            {
+                /* WebCtrl.removeFromPagePopulation({element:this.list,obj:this});
+                this.list_container.innerHTML=e.detail.data;
+                WebCtrl.addToPagePopulation({obj:this,element:this.list_container.firstElementChild});*/
+                WebCtrl.removeFromPagePopulation({element:this.list,obj:this});
+                WebCtrl.removeFromPagePopulation({element:this.lst_records,obj:this});
+                WebCtrl.removeFromPagePopulation({element:this.lst_mnsGroup,obj:this});
+                
+                WebCtrl.appendAndAdd({append_to:{element:this.list_container},
+                    element:e.detail.data,obj:this,debug:true,
+                    populateWithShadows:["LIST-BOX"]});
+                
+                
+                if (e.detail.subject=="r" && this.lst_records!=undefined)
+                {
+                    for (var lstRec of this.lst_records)
+                    {
+                        lstRec.getColumn("entry").highlight(e.detail.query);
+                    }
+                }
+                else
+                {
+                    for (var lstMns of this.lst_mnsGroup)
+                    {
+                        lstMns.getColumn("title").highlight(e.detail.query);
+                    }   
+                } 
+            }
+            
+            
+
+        }
+        var m=new Manuscripts();
+    </script>
 </div>
 </div>
 

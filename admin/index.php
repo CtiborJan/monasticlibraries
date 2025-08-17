@@ -1,10 +1,10 @@
 <?php
-include "../src/incl/show_errors.incl";
+include "../src/show_errors.incl";
+include "../src/RouteFinder.class.php";
 
-preg_match("#monasticlibraries\/admin\/([^/?]*)#",$_SERVER["REQUEST_URI"],$matches);
-
-$page_name=strtolower($matches[1]);
-if ($page_name=="")
+preg_match("#monasticlibraries(\/admin\/?[^?]*)#",$_SERVER["REQUEST_URI"],$matches);
+$route=strtolower($matches[1]);
+if ($route=="/admin" || $route=="/admin/")
 {
 	?>
 <html>
@@ -20,18 +20,25 @@ if ($page_name=="")
     </body>
 </html>
         <?php
-        die();
 }
-if (file_exists("../src/admin_$page_name.ctrl.php"))
-	include "../src/admin_".$page_name.".ctrl.php";
-else
+else 
 {
-	#var_dump($_SERVER);
-	#var_dump($_REQUEST);
-	header('HTTP/1.0 404 Not Found');
-	echo "Stránka nenalezena.";
-	die;
-}	
-$controllerClass="ctrl_admin_".$page_name;
+    $routeController= cls_RouteFinder::getMethodForRoute($route, "../src");
 
-include "../templates/admin.html";
+    if ($routeController!=null)
+    {
+        $i=0;
+        if (sizeof($routeController)==1)
+        {
+            $params=[];
+            foreach ($routeController[$i][1] as $p)
+                $params[]=$p[1];
+            $controllerClass=$routeController[$i][0][2]->invokeArgs(null,$params);
+        }
+    }
+    else
+    {
+        echo "Admin route not found: " .$route;
+    }
+
+}

@@ -1,0 +1,6 @@
+insert into tmp_rukopisy (nazev,signatura,popis,misto_vzniku,obdobi,skupina,url,pozn) values 
+('Brno, Moravská zemská knihovna, Mk P 37','{9}Mk P 37','Italy (Roma), 1472, paper, 261 ff. 2° (40,5 × 28,5 cm), medieval binding','Italy (Roma)','1472','9','https://www.digitalniknihovna.cz/mzk/uuid/uuid:96dedaf1-5ed9-4fe4-b9be-702f6ab9ea01',''),
+('Brno, Moravská zemská knihovna, Mk P 122','{9}Mk P 122','Germany (Nürnberg), 1477, paper, I + 395 ff. 2° (29,5 × 21 cm), medieval binding','Germany (Nürnberg)','1477','9','https://www.digitalniknihovna.cz/mzk/uuid/uuid:01e33406-927a-49bd-8d33-80e2f6b0abe6',''),
+('Praha, Knihovna Národního muzea, Kapucínská knihovna 68','{9}Kapucínská knihovna 68','Switzerland (Basel), 1485, paper, 369 + IV ff. 2° (37 × 25 cm), modern binding','Switzerland (Basel)','1485','9','',''),
+('Teplá, kanonie premonstrátů, RF 42','{9}RF 42','Czech Lands + Germany (Heidelberg), XV + 1485, paper, 288 (recte 285) (manuscript parts) + 104 (printed parts) + I ff. 22 × 15 cm, medieval binding','Czech Lands + Germany (Heidelberg)','XV + 1485','9','',''),
+('Teplá, kanonie premonstrátů, RF 84','{9}RF 84','Germany (Nürnberg), 1497, paper, I + 352 + I ff. 2° (36,5 × 25 cm), medieval binding','Germany (Nürnberg)','1497','9','','')

@@ -1,0 +1,6 @@
+insert into tmp_rukopisy (nazev,signatura,popis,misto_vzniku,obdobi,skupina,url,pozn) values 
+('Brno, Moravská zemská knihovna, Mk 72','Mk 72','XIV','','','8','https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=MZK___-MZKB__MK_0000_072_3VIW779-xx',''),
+('Praha, Knihovna Národního muzea, XII A 10','XII A 10','Francie (Paříž), XIII ex. + XIII/XIV, perg., II + 490 ff. 45 × 28 cm, ilum., vazba dobová','Francie (Paříž)','XIII ex. + XIII/XIV','8','https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NMP___XII_A_10____47DJIC3-cs',''),
+('Praha, Knihovna Národního muzea, XII A 17','XII A 17','Čechy, XIV ex., perg., I + 286 ff. 46,5 × 31,5 cm, ilum., vazba soudobá','Čechy','XIV ex.','8','https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NMP___XII_A_17____1VHTGE0-cs',''),
+('Praha, Národní knihovna České republiky, VI C 29','VI C 29','pap., 1398 (nebo 1399), II + 247 (recte 248) + I ff. 29,5 × 20 cm','pap.','1398 (nebo 1399)','8','https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__VI_C_29_____1GPFZM5-cs',''),
+('Praha, Národní knihovna České republiky, VII B 13','VII B 13','pap., XIV/XV, 335 ff. 29,5 × 22 cm','pap.','XIV/XV','8','https://www.manuscriptorium.com/apps/index.php?direct=record&amp;pid=AIPDIG-NKCR__VII_B_13____25V38F3-cs','')

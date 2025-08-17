@@ -1,6 +1,18 @@
 <?php
 include_once "db.class.php";
 include_once "AjaxResponse.class.php";
+class cls_common_ctrl
+{
+    public static function include_template($templateContent,$templatePath="../templates/manuscripts/content.html")
+    {
+        ob_start();
+        include $templatePath;
+        $templateContent= ob_get_clean();
+        include "../templates/main.html";
+        
+    }
+}
+
 class cls_common
 {
     public static function table_exists($table) 
@@ -12,49 +24,106 @@ class cls_common
     public static function construct_table_from_mysql_result($result,...$thead)
     {
         $expandable=false;
-        $rv="<table>\n";
+        
+        $rv="\n<table>\n";
+        
         $rv.="<thead>\n<tr>\n";
         foreach ($thead as $th)
         {
+            if (is_array($th[0])==false)
+            {
                 if ($th[0]=="_EX_")
                 {
+                    if ($th[1]!="")
+                    {//expand column is added only if expand url or expand function is defined
                         $expandable=true;
-                        $rv.="<th expand_column='true' exp_url='$th[1]'>";
-                        continue;
+                        $rv.="<th expand_column='true' exp_url='$th[1]'></th>";
+                    }
+                    continue;
                 }
-
                 $name=$th[0];
-                $capt=$th[1];
-                if ($capt=="")
-                        $capt=$name;
-                $rv.="<th name='$name' caption='$capt'></th>";
+            }
+            else
+            {
+                $attributes="";
+                $style="";
+                $name=$th[0][0];
+                if ($th[0][1]!="")
+                {
+                    $attrs=explode(" ", $th[0][1]);
+                    foreach ($attrs as $attr) 
+                    {
+                        $attributes.=$attr."=1";
+                    }
+                }
+                if ($th[0][2]!="")
+                {
+                    if (strpos($th[3],":")===false)//class name
+                        $style=" class='".$th[3]."'";
+                    else //style
+                        $style=" style='".$th[3]."'";
+                }
+            }
+                
+            $capt=$th[1];
+            if ($capt=="")
+                    $capt=$name;
+            $rv.="<th name='$name' $style $attributes>$capt</th>";
         }
         $rv.="</tr>\n</thead>\n<tbody>\n";
 
         while($row=$result->fetch_assoc())
         {
-                $tr="<tr>";
+            $tr="<tr>";
 
 
-                if ($expandable==true)
-                        $tr.="<td class='lst_expand_c exp'></td>";
-                foreach ($thead as $th)
-                {
-                        if ($th[0]!="_EX_")
+            if ($expandable==true)
+                    $tr.="<td class='lst_expand_c'></td>";
+            foreach ($thead as $th)
+            {
+                    if ($th[0]!="_EX_")
+                    {
+                        $style="";
+                        if ($th[3]!="")
                         {
-                                $colname=$th[2];
-                                $tr.="<td>".$row[$colname]."</td>";
+                            if (strpos($th[3],":")===false)//class name
+                                $style=" class='".$th[3]."'";
+                            else //style
+                                $style=" style='".$th[3]."'";
                         }
-                }
-                $tr.="</tr>\n";
-                if ($expandable==true)
+                        if (is_array($th[2])==true)
+                        {
+                            $function_name=$th[2][0];
+                            $args=$th[2][1];
+                            $textContent=call_user_func($function_name,$row,$args);
+                        }
+                        else
+                        {
+                        
+                            preg_match_all("/\{([^}]+)\}/", $th[2],$matches);
+                            $textContent=$th[2];
+                            foreach ($matches[1] as $match)
+                            {   
+                                $textContent=str_replace('{'.$match.'}', $row[$match], $textContent);
+                            }
+                        }
+                        
+                        
+                        $tr.="<td".$style.">".$textContent."</td>";
+                    }
+                    
+            }
+            $tr.="</tr>\n";
+            if ($expandable==true)
+            {
+                if ($thead[0][2]==1)//expand directly
                 {
-                        if ($thead[0][2]==1)
-                                $tr.="<tr class='lst_expanded_row' style='display:none'><td class='exp_td' colspan='100'>\n\t ".
-                                call_user_func($thead[0][1],$row). " \n</td></tr>\n";
+                    $tr.="<tr class='lst_expanded_row' style='display:none'><td class='exp_td' colspan='100'>\n\t ".
+                    call_user_func($thead[0][1],$row,$thead[0][3]). " \n</td></tr>\n";
                 }
+            }
 
-                $rv.=$tr;
+            $rv.=$tr;
         }
 
         $rv.="</tbody>\n</table>";
